@@ -681,6 +681,36 @@
         grid-template-columns: repeat(3, 1fr);
       }
     }
+    .mixed-ops-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 5px;
+    }
+    .mixed-op-btn {
+      background: #edf2f7;
+      border: 3px solid transparent;
+      border-radius: 12px;
+      padding: 10px 0;
+      font-size: 1.4rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .mixed-op-btn:hover {
+      background: #e2e8f0;
+      transform: translateY(-2px);
+    }
+    .mixed-op-btn:active {
+      transform: scale(0.95);
+    }
+    .mixed-op-btn.selected {
+      background: rgba(108, 92, 231, 0.15);
+      border-color: #6c5ce7;
+      color: #6c5ce7;
+    }
     .version-tag {
       position: absolute;
       bottom: 8px;
@@ -831,6 +861,17 @@
             <span class="slider-round"></span>
           </label>
         </div>
+        <div class="setting-row">
+          <div class="setting-label">
+            <span>Mixed Mode Operations</span>
+          </div>
+          <div class="mixed-ops-grid">
+            <button class="mixed-op-btn selected" data-op="addition" title="Add">➕</button>
+            <button class="mixed-op-btn selected" data-op="subtraction" title="Subtract">➖</button>
+            <button class="mixed-op-btn selected" data-op="multiplication" title="Multiply">✖️</button>
+            <button class="mixed-op-btn selected" data-op="division" title="Divide">➗</button>
+          </div>
+        </div>
         <button class="modal-btn danger" id="reset-high-score-btn">Reset High Score</button>
         <button class="modal-btn" id="close-settings-btn">Close</button>
       </div>
@@ -854,13 +895,14 @@
   </div>
 
   <script>
-    const SCRIPT_VERSION = 'v1.6.0-202607081020';
+    const SCRIPT_VERSION = 'v1.7.0-202607081025';
 
     let gameMode = 'choice';
     let mathOperation = 'multiplication';
     let currentActiveOp = 'multiplication';
     let timerDuration = 9;
     let soundEnabled = true;
+    let mixedOps = ['addition', 'subtraction', 'multiplication', 'division'];
 
     let score = 0;
     let streak = 0;
@@ -936,6 +978,18 @@
         soundEnabled = savedSound === 'true';
       }
       soundToggle.checked = soundEnabled;
+
+      const savedMixedOps = localStorage.getItem('mq_mixed_ops');
+      if (savedMixedOps) {
+        try {
+          mixedOps = JSON.parse(savedMixedOps);
+        } catch (e) {
+          mixedOps = ['addition', 'subtraction', 'multiplication', 'division'];
+        }
+      }
+      document.querySelectorAll('.mixed-op-btn').forEach(btn => {
+        btn.classList.toggle('selected', mixedOps.includes(btn.dataset.op));
+      });
 
       const savedHighScore = localStorage.getItem('mq_high_score');
       if (savedHighScore) {
@@ -1083,7 +1137,7 @@
 
       let activeOp = mathOperation;
       if (mathOperation === 'mixed') {
-        const ops = ['addition', 'subtraction', 'multiplication', 'division'];
+        const ops = mixedOps.length > 0 ? mixedOps : ['addition', 'subtraction', 'multiplication', 'division'];
         activeOp = ops[Math.floor(Math.random() * ops.length)];
       }
       currentActiveOp = activeOp;
@@ -1477,6 +1531,23 @@
     soundToggle.addEventListener('change', () => {
       soundEnabled = soundToggle.checked;
       localStorage.setItem('mq_sound_enabled', soundEnabled);
+    });
+
+    document.querySelectorAll('.mixed-op-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const op = btn.dataset.op;
+        const index = mixedOps.indexOf(op);
+        if (index > -1) {
+          if (mixedOps.length > 1) {
+            mixedOps.splice(index, 1);
+            btn.classList.remove('selected');
+          }
+        } else {
+          mixedOps.push(op);
+          btn.classList.add('selected');
+        }
+        localStorage.setItem('mq_mixed_ops', JSON.stringify(mixedOps));
+      });
     });
 
     resetHighScoreBtn.addEventListener('click', () => {
