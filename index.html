@@ -590,10 +590,21 @@
         padding: 10px 0;
       }
     }
+    .version-tag {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      font-size: 10px;
+      color: rgba(0, 0, 0, 0.3);
+      font-family: monospace;
+      pointer-events: none;
+      z-index: 1000;
+    }
   </style>
 </head>
 <body>
   <div id="app">
+    <div class="version-tag" id="version-display"></div>
     <canvas id="confetti-canvas"></canvas>
 
     <div id="start-screen" class="screen active">
@@ -720,7 +731,7 @@
   </div>
 
   <script>
-    const SCRIPT_VERSION = 'v1.0.2-202607080910';
+    const SCRIPT_VERSION = 'v1.0.3-202607080915';
 
     let gameMode = 'choice';
     let timerDuration = 9;
@@ -797,6 +808,8 @@
         highScore = parseInt(savedHighScore, 10);
         startHighScoreEl.textContent = highScore;
       }
+
+      document.getElementById('version-display').textContent = SCRIPT_VERSION;
 
       window.addEventListener('resize', resizeConfettiCanvas);
       resizeConfettiCanvas();
