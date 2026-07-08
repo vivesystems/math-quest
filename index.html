@@ -5,9 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Math Quest">
-  <link rel="manifest" href='data:application/manifest+json,{"name":"Math Quest","short_name":"Math Quest","display":"standalone","start_url":"https://vivesystems.github.io/math-quest/"}'>
-  <title>Kids Multiplication Quest</title>
+  <meta name="apple-mobile-web-app-title" content="Ian's Math Quest">
+  <link rel="manifest" href='data:application/manifest+json,{"name":"Ian&#39;s Math Quest","short_name":"Ian&#39;s Math Quest","display":"standalone","start_url":"https://vivesystems.github.io/math-quest/"}'>
+  <title>Ian's Math Quest</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23a1c4fd'/%3E%3Cpath d='M32 46 C32 46 16 34 16 24 A8 8 0 0 1 32 16 A8 8 0 0 1 48 24 C48 34 32 46 32 46 Z' fill='%23ff7675'/%3E%3Ctext x='32' y='24' font-family='sans-serif' font-weight='900' font-size='14' fill='%232d3748' text-anchor='middle'%3EIan%3C/text%3E%3Ctext x='32' y='52' font-family='sans-serif' font-weight='900' font-size='14' fill='%232d3748' text-anchor='middle'%3EMath%3C/text%3E%3C/svg%3E">
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     * {
@@ -638,40 +639,34 @@
       font-size: 0.85rem;
       text-align: center;
     }
-    .start-settings {
-      width: 100%;
-      background: rgba(255, 255, 255, 0.4);
-      border-radius: 20px;
-      padding: 15px 20px;
-      margin-top: 25px;
-      border: 1px solid rgba(255, 255, 255, 0.3);
+    .start-settings-btn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: rgba(255, 255, 255, 0.6);
+      border: none;
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      cursor: pointer;
       display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .start-settings-title {
-      font-weight: 700;
-      color: #2d3748;
-      font-size: 1rem;
-      margin-bottom: 5px;
-      text-align: center;
-    }
-    .start-setting-row {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .start-setting-row.inline-row {
-      flex-direction: row;
-      justify-content: space-between;
       align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 10;
     }
-    .start-setting-label {
-      font-weight: 700;
-      color: #4a5568;
-      font-size: 0.9rem;
-      display: flex;
-      justify-content: space-between;
+    .start-settings-btn:hover {
+      transform: translateY(-2px);
+      background: rgba(255, 255, 255, 0.8);
+    }
+    .start-settings-btn:active {
+      transform: scale(0.9);
+    }
+    .start-settings-btn svg {
+      width: 22px;
+      height: 22px;
+      fill: #4a5568;
     }
     @media (max-width: 480px) {
       .operation-select-container {
@@ -680,7 +675,7 @@
     }
     .version-tag {
       position: absolute;
-      top: 8px;
+      bottom: 8px;
       right: 8px;
       font-size: 10px;
       color: rgba(0, 0, 0, 0.3);
@@ -696,7 +691,12 @@
     <canvas id="confetti-canvas"></canvas>
 
     <div id="start-screen" class="screen active">
-      <h1>Math Quest</h1>
+      <button class="start-settings-btn" id="start-settings-btn">
+        <svg viewBox="0 0 24 24">
+          <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+        </svg>
+      </button>
+      <h1>Ian's Math Quest</h1>
       <div class="logo-container">
         <svg class="mascot-svg" viewBox="0 0 200 200">
           <circle cx="100" cy="100" r="80" fill="#a1c4fd"/>
@@ -756,26 +756,6 @@
         </div>
       </div>
       <button class="play-btn" id="play-button">Play</button>
-      <div class="start-settings">
-        <div class="start-settings-title">Settings</div>
-        <div class="start-setting-row">
-          <div class="start-setting-label">
-            <span>Timer (seconds)</span>
-            <span id="start-timer-val">9s</span>
-          </div>
-          <div class="setting-input-wrapper">
-            <input type="range" min="3" max="20" value="9" class="setting-slider" id="start-timer-slider">
-          </div>
-        </div>
-        <div class="start-setting-row inline-row">
-          <span class="start-setting-label">Sound Effects</span>
-          <label class="toggle-switch">
-            <input type="checkbox" id="start-sound-toggle" checked>
-            <span class="slider-round"></span>
-          </label>
-        </div>
-        <button class="modal-btn danger" id="start-reset-high-score-btn" style="margin-top: 10px; width: 100%;">Reset High Score</button>
-      </div>
     </div>
 
     <div id="game-screen" class="screen">
@@ -863,7 +843,7 @@
   </div>
 
   <script>
-    const SCRIPT_VERSION = 'v1.1.0-202607080920';
+    const SCRIPT_VERSION = 'v1.3.0-202607080950';
 
     let gameMode = 'choice';
     let mathOperation = 'multiplication';
@@ -891,16 +871,13 @@
     const playButton = document.getElementById('play-button');
     const backButton = document.getElementById('back-button');
     const settingsButton = document.getElementById('settings-button');
+    const startSettingsBtn = document.getElementById('start-settings-btn');
     const settingsModal = document.getElementById('settings-modal');
     const closeSettingsBtn = document.getElementById('close-settings-btn');
     const resetHighScoreBtn = document.getElementById('reset-high-score-btn');
     const timerSlider = document.getElementById('timer-slider');
     const timerVal = document.getElementById('timer-val');
     const soundToggle = document.getElementById('sound-toggle');
-    const startTimerSlider = document.getElementById('start-timer-slider');
-    const startTimerVal = document.getElementById('start-timer-val');
-    const startSoundToggle = document.getElementById('start-sound-toggle');
-    const startResetHighScoreBtn = document.getElementById('start-reset-high-score-btn');
     const currentScoreEl = document.getElementById('current-score');
     const currentStreakEl = document.getElementById('current-streak');
     const timerBar = document.getElementById('timer-bar');
@@ -920,29 +897,28 @@
     const questionHistory = [];
 
     function init() {
-      const savedMode = localStorage.getItem('mq_game_mode');
-      if (savedMode) {
-        gameMode = savedMode;
-        document.querySelectorAll('.mode-card').forEach(card => {
-          card.classList.toggle('selected', card.dataset.mode === gameMode);
-        });
+      let savedMode = localStorage.getItem('mq_game_mode');
+      if (!savedMode) {
+        savedMode = 'choice';
+        localStorage.setItem('mq_game_mode', savedMode);
       }
+      gameMode = savedMode;
+      document.querySelectorAll('.mode-card').forEach(card => {
+        card.classList.toggle('selected', card.dataset.mode === gameMode);
+      });
 
       const savedTimer = localStorage.getItem('mq_timer_duration');
       if (savedTimer) {
         timerDuration = parseInt(savedTimer, 10);
       }
       timerSlider.value = timerDuration;
-      startTimerSlider.value = timerDuration;
       timerVal.textContent = timerDuration + 's';
-      startTimerVal.textContent = timerDuration + 's';
 
       const savedSound = localStorage.getItem('mq_sound_enabled');
       if (savedSound !== null) {
         soundEnabled = savedSound === 'true';
       }
       soundToggle.checked = soundEnabled;
-      startSoundToggle.checked = soundEnabled;
 
       const savedHighScore = localStorage.getItem('mq_high_score');
       if (savedHighScore) {
@@ -950,13 +926,15 @@
         startHighScoreEl.textContent = highScore;
       }
 
-      const savedOperation = localStorage.getItem('mq_math_operation');
-      if (savedOperation) {
-        mathOperation = savedOperation;
-        document.querySelectorAll('.operation-card').forEach(card => {
-          card.classList.toggle('selected', card.dataset.op === mathOperation);
-        });
+      let savedOperation = localStorage.getItem('mq_math_operation');
+      if (!savedOperation) {
+        savedOperation = 'multiplication';
+        localStorage.setItem('mq_math_operation', savedOperation);
       }
+      mathOperation = savedOperation;
+      document.querySelectorAll('.operation-card').forEach(card => {
+        card.classList.toggle('selected', card.dataset.op === mathOperation);
+      });
 
       document.getElementById('version-display').textContent = SCRIPT_VERSION;
 
@@ -1433,39 +1411,29 @@
       settingsModal.classList.remove('active');
     });
 
-    function updateTimerDuration(val) {
-      timerDuration = parseInt(val, 10);
-      timerSlider.value = timerDuration;
-      startTimerSlider.value = timerDuration;
+    timerSlider.addEventListener('input', () => {
+      timerDuration = parseInt(timerSlider.value, 10);
       timerVal.textContent = timerDuration + 's';
-      startTimerVal.textContent = timerDuration + 's';
       localStorage.setItem('mq_timer_duration', timerDuration);
-    }
+    });
 
-    timerSlider.addEventListener('input', (e) => updateTimerDuration(e.target.value));
-    startTimerSlider.addEventListener('input', (e) => updateTimerDuration(e.target.value));
-
-    function updateSoundEnabled(enabled) {
-      soundEnabled = enabled;
-      soundToggle.checked = soundEnabled;
-      startSoundToggle.checked = soundEnabled;
+    soundToggle.addEventListener('change', () => {
+      soundEnabled = soundToggle.checked;
       localStorage.setItem('mq_sound_enabled', soundEnabled);
-    }
+    });
 
-    soundToggle.addEventListener('change', (e) => updateSoundEnabled(e.target.checked));
-    startSoundToggle.addEventListener('change', (e) => updateSoundEnabled(e.target.checked));
-
-    function resetHighScore() {
+    resetHighScoreBtn.addEventListener('click', () => {
       if (confirm('Are you sure you want to reset the high score?')) {
         highScore = 0;
         localStorage.setItem('mq_high_score', highScore);
         startHighScoreEl.textContent = highScore;
         settingsModal.classList.remove('active');
       }
-    }
+    });
 
-    resetHighScoreBtn.addEventListener('click', resetHighScore);
-    startResetHighScoreBtn.addEventListener('click', resetHighScore);
+    startSettingsBtn.addEventListener('click', () => {
+      settingsModal.classList.add('active');
+    });
 
     document.querySelectorAll('.operation-card').forEach(card => {
       card.addEventListener('click', () => {
