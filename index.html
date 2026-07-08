@@ -2,10 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Math Quest">
+  <link rel="manifest" href='data:application/manifest+json,{"name":"Math Quest","short_name":"Math Quest","display":"standalone","start_url":"https://vivesystems.github.io/math-quest/"}'>
   <title>Kids Multiplication Quest</title>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
@@ -719,7 +720,7 @@
   </div>
 
   <script>
-    const SCRIPT_VERSION = 'v1.0.1-202607080908';
+    const SCRIPT_VERSION = 'v1.0.2-202607080910';
 
     let gameMode = 'choice';
     let timerDuration = 9;
