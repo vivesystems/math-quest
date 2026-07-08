@@ -92,12 +92,19 @@
       justify-content: center;
       flex: 1;
     }
-    .mascot-svg {
+    .mascot-svg, .mascot-img {
       width: 180px;
       height: 180px;
       margin-bottom: 20px;
       filter: drop-shadow(0 8px 12px rgba(0,0,0,0.1));
       animation: float 4s ease-in-out infinite;
+    }
+    .mascot-img {
+      border-radius: 50%;
+      border: 6px solid white;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      background: white;
+      object-fit: cover;
     }
     @keyframes float {
       0% { transform: translateY(0px) rotate(0deg); }
@@ -546,7 +553,7 @@
         font-size: 2.2rem;
         margin-top: 5px;
       }
-      .mascot-svg {
+      .mascot-svg, .mascot-img {
         width: 120px;
         height: 120px;
         margin-bottom: 10px;
@@ -699,20 +706,7 @@
       </button>
       <h1>Ian's Math Quest</h1>
       <div class="logo-container">
-        <svg class="mascot-svg" viewBox="0 0 200 200">
-          <circle cx="100" cy="100" r="80" fill="#a1c4fd"/>
-          <path d="M 60 70 Q 75 55 90 70" stroke="#2d3748" stroke-width="8" stroke-linecap="round" fill="none"/>
-          <path d="M 110 70 Q 125 55 140 70" stroke="#2d3748" stroke-width="8" stroke-linecap="round" fill="none"/>
-          <circle cx="75" cy="85" r="10" fill="#2d3748"/>
-          <circle cx="125" cy="85" r="10" fill="#2d3748"/>
-          <circle cx="72" cy="82" r="3" fill="white"/>
-          <circle cx="122" cy="82" r="3" fill="white"/>
-          <ellipse cx="75" cy="98" rx="8" ry="4" fill="#ff7675" opacity="0.6"/>
-          <ellipse cx="125" cy="98" rx="8" ry="4" fill="#ff7675" opacity="0.6"/>
-          <path d="M 80 120 Q 100 145 120 120" stroke="#2d3748" stroke-width="8" stroke-linecap="round" fill="none"/>
-          <path d="M 60 140 Q 100 170 140 140" fill="#ff7675"/>
-          <polygon points="100,20 115,50 85,50" fill="#ffd166"/>
-        </svg>
+        <img class="mascot-img" src="mascot.png" alt="Mascot">
         <div class="stat-badge" style="margin-bottom: 20px;">
           <span class="stat-icon">🏆</span>
           <span>High Score: <span id="start-high-score">0</span></span>
@@ -841,10 +835,26 @@
         <button class="modal-btn" id="close-settings-btn">Close</button>
       </div>
     </div>
+
+    <div class="modal-overlay" id="summary-modal">
+      <div class="modal-content">
+        <div class="modal-title">Round Summary</div>
+        <div class="setting-row" style="text-align: center; flex-direction: column; gap: 8px;">
+          <div style="font-size: 1.15rem; color: #4a5568; font-weight: 600;">You answered 10 questions!</div>
+          <div style="font-size: 1.7rem; color: #2d3748; font-weight: 700; margin: 10px 0;">
+            Total Time: <span id="summary-total-time">0.0</span>s
+          </div>
+          <div style="font-size: 1.25rem; color: #718096; font-weight: 600;">
+            Average: <span id="summary-avg-time">0.0</span>s per answer
+          </div>
+        </div>
+        <button class="modal-btn" id="summary-continue-btn" style="margin-top: 10px;">Continue</button>
+      </div>
+    </div>
   </div>
 
   <script>
-    const SCRIPT_VERSION = 'v1.4.0-202607081000';
+    const SCRIPT_VERSION = 'v1.6.0-202607081020';
 
     let gameMode = 'choice';
     let mathOperation = 'multiplication';
@@ -861,6 +871,8 @@
     let correctAnswer = 0;
     let currentInput = '';
     let isAnsweringBlocked = false;
+    let questionStartTime = 0;
+    let recentQuestionTimes = [];
 
     let timerInterval = null;
     let timeRemaining = 0;
@@ -879,6 +891,10 @@
     const timerSlider = document.getElementById('timer-slider');
     const timerVal = document.getElementById('timer-val');
     const soundToggle = document.getElementById('sound-toggle');
+    const summaryModal = document.getElementById('summary-modal');
+    const summaryTotalTime = document.getElementById('summary-total-time');
+    const summaryAvgTime = document.getElementById('summary-avg-time');
+    const summaryContinueBtn = document.getElementById('summary-continue-btn');
     const currentScoreEl = document.getElementById('current-score');
     const currentStreakEl = document.getElementById('current-streak');
     const timerBar = document.getElementById('timer-bar');
@@ -1119,6 +1135,7 @@
 
       setupInputArea();
       resetTimer();
+      questionStartTime = Date.now();
     }
 
     function setupInputArea() {
@@ -1238,10 +1255,16 @@
       }
     }
 
+    function recordAnswerTime() {
+      const elapsed = (Date.now() - questionStartTime) / 1000;
+      recentQuestionTimes.push(elapsed);
+    }
+
     function handleChoiceSelection(button, selectedValue) {
       if (isAnsweringBlocked) return;
       isAnsweringBlocked = true;
       clearInterval(timerInterval);
+      recordAnswerTime();
 
       if (selectedValue === correctAnswer) {
         button.classList.add('correct');
@@ -1265,6 +1288,7 @@
       if (isAnsweringBlocked) return;
       isAnsweringBlocked = true;
       clearInterval(timerInterval);
+      recordAnswerTime();
 
       if (selectedValue === correctAnswer) {
         button.classList.add('correct');
@@ -1304,6 +1328,7 @@
       if (isAnsweringBlocked || currentInput === '') return;
       isAnsweringBlocked = true;
       clearInterval(timerInterval);
+      recordAnswerTime();
 
       const val = parseInt(currentInput, 10);
       if (val === correctAnswer) {
@@ -1317,6 +1342,7 @@
 
     function handleTimeout() {
       isAnsweringBlocked = true;
+      recordAnswerTime();
       questionCard.classList.add('shake-animation');
       playFailureSound();
 
@@ -1334,9 +1360,21 @@
 
       setTimeout(() => {
         questionCard.classList.remove('shake-animation');
-        isAnsweringBlocked = false;
-        generateQuestion();
-      }, 1500);
+        if (recentQuestionTimes.length >= 10) {
+          showRoundSummary();
+        } else {
+          isAnsweringBlocked = false;
+          generateQuestion();
+        }
+      }, 3000);
+    }
+
+    function showRoundSummary() {
+      const total = recentQuestionTimes.reduce((sum, val) => sum + val, 0);
+      const avg = total / recentQuestionTimes.length;
+      summaryTotalTime.textContent = total.toFixed(1);
+      summaryAvgTime.textContent = avg.toFixed(2);
+      summaryModal.classList.add('active');
     }
 
     function handleCorrectAnswer() {
@@ -1358,8 +1396,12 @@
       }
 
       setTimeout(() => {
-        isAnsweringBlocked = false;
-        generateQuestion();
+        if (recentQuestionTimes.length >= 10) {
+          showRoundSummary();
+        } else {
+          isAnsweringBlocked = false;
+          generateQuestion();
+        }
       }, 800);
     }
 
@@ -1372,9 +1414,13 @@
 
       setTimeout(() => {
         questionCard.classList.remove('shake-animation');
-        isAnsweringBlocked = false;
-        generateQuestion();
-      }, 1500);
+        if (recentQuestionTimes.length >= 10) {
+          showRoundSummary();
+        } else {
+          isAnsweringBlocked = false;
+          generateQuestion();
+        }
+      }, 3000);
     }
 
     document.querySelectorAll('.mode-card').forEach(card => {
@@ -1392,6 +1438,7 @@
       gameScreen.classList.add('active');
       score = 0;
       streak = 0;
+      recentQuestionTimes = [];
       currentScoreEl.textContent = score;
       currentStreakEl.textContent = streak;
       generateQuestion();
@@ -1401,6 +1448,8 @@
       clearInterval(timerInterval);
       gameScreen.classList.remove('active');
       startScreen.classList.add('active');
+      summaryModal.classList.remove('active');
+      recentQuestionTimes = [];
       startHighScoreEl.textContent = highScore;
     });
 
@@ -1410,6 +1459,13 @@
 
     closeSettingsBtn.addEventListener('click', () => {
       settingsModal.classList.remove('active');
+    });
+
+    summaryContinueBtn.addEventListener('click', () => {
+      summaryModal.classList.remove('active');
+      recentQuestionTimes = [];
+      isAnsweringBlocked = false;
+      generateQuestion();
     });
 
     timerSlider.addEventListener('input', () => {
