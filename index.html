@@ -590,6 +590,94 @@
         padding: 10px 0;
       }
     }
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #4a5568;
+      margin-top: 15px;
+      margin-bottom: 10px;
+      text-align: left;
+      width: 100%;
+    }
+    .operation-select-container {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      margin-bottom: 25px;
+    }
+    .operation-card {
+      background: rgba(255, 255, 255, 0.6);
+      border: 3px solid transparent;
+      border-radius: 16px;
+      padding: 12px 6px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.04);
+    }
+    .operation-card:hover {
+      transform: translateY(-4px);
+      background: rgba(255, 255, 255, 0.8);
+    }
+    .operation-card.selected {
+      border-color: #6c5ce7;
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 10px 20px rgba(108, 92, 231, 0.15);
+    }
+    .operation-icon {
+      font-size: 1.8rem;
+      margin-bottom: 6px;
+    }
+    .operation-title {
+      font-weight: 700;
+      color: #2d3748;
+      font-size: 0.85rem;
+      text-align: center;
+    }
+    .start-settings {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.4);
+      border-radius: 20px;
+      padding: 15px 20px;
+      margin-top: 25px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .start-settings-title {
+      font-weight: 700;
+      color: #2d3748;
+      font-size: 1rem;
+      margin-bottom: 5px;
+      text-align: center;
+    }
+    .start-setting-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .start-setting-row.inline-row {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .start-setting-label {
+      font-weight: 700;
+      color: #4a5568;
+      font-size: 0.9rem;
+      display: flex;
+      justify-content: space-between;
+    }
+    @media (max-width: 480px) {
+      .operation-select-container {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
     .version-tag {
       position: absolute;
       top: 8px;
@@ -629,6 +717,30 @@
           <span>High Score: <span id="start-high-score">0</span></span>
         </div>
       </div>
+      <div class="section-title">Select Operation</div>
+      <div class="operation-select-container">
+        <div class="operation-card" data-op="addition">
+          <div class="operation-icon">➕</div>
+          <div class="operation-title">Add</div>
+        </div>
+        <div class="operation-card" data-op="subtraction">
+          <div class="operation-icon">➖</div>
+          <div class="operation-title">Subtract</div>
+        </div>
+        <div class="operation-card selected" data-op="multiplication">
+          <div class="operation-icon">✖️</div>
+          <div class="operation-title">Multiply</div>
+        </div>
+        <div class="operation-card" data-op="division">
+          <div class="operation-icon">➗</div>
+          <div class="operation-title">Divide</div>
+        </div>
+        <div class="operation-card" data-op="mixed">
+          <div class="operation-icon">🎲</div>
+          <div class="operation-title">Mixed</div>
+        </div>
+      </div>
+      <div class="section-title">Select Mode</div>
       <div class="mode-select-container">
         <div class="mode-card selected" data-mode="choice">
           <div class="mode-icon">🎈</div>
@@ -644,6 +756,26 @@
         </div>
       </div>
       <button class="play-btn" id="play-button">Play</button>
+      <div class="start-settings">
+        <div class="start-settings-title">Settings</div>
+        <div class="start-setting-row">
+          <div class="start-setting-label">
+            <span>Timer (seconds)</span>
+            <span id="start-timer-val">9s</span>
+          </div>
+          <div class="setting-input-wrapper">
+            <input type="range" min="3" max="20" value="9" class="setting-slider" id="start-timer-slider">
+          </div>
+        </div>
+        <div class="start-setting-row inline-row">
+          <span class="start-setting-label">Sound Effects</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="start-sound-toggle" checked>
+            <span class="slider-round"></span>
+          </label>
+        </div>
+        <button class="modal-btn danger" id="start-reset-high-score-btn" style="margin-top: 10px; width: 100%;">Reset High Score</button>
+      </div>
     </div>
 
     <div id="game-screen" class="screen">
@@ -731,9 +863,11 @@
   </div>
 
   <script>
-    const SCRIPT_VERSION = 'v1.0.3-202607080915';
+    const SCRIPT_VERSION = 'v1.1.0-202607080920';
 
     let gameMode = 'choice';
+    let mathOperation = 'multiplication';
+    let currentActiveOp = 'multiplication';
     let timerDuration = 9;
     let soundEnabled = true;
 
@@ -763,6 +897,10 @@
     const timerSlider = document.getElementById('timer-slider');
     const timerVal = document.getElementById('timer-val');
     const soundToggle = document.getElementById('sound-toggle');
+    const startTimerSlider = document.getElementById('start-timer-slider');
+    const startTimerVal = document.getElementById('start-timer-val');
+    const startSoundToggle = document.getElementById('start-sound-toggle');
+    const startResetHighScoreBtn = document.getElementById('start-reset-high-score-btn');
     const currentScoreEl = document.getElementById('current-score');
     const currentStreakEl = document.getElementById('current-streak');
     const timerBar = document.getElementById('timer-bar');
@@ -793,20 +931,31 @@
       const savedTimer = localStorage.getItem('mq_timer_duration');
       if (savedTimer) {
         timerDuration = parseInt(savedTimer, 10);
-        timerSlider.value = timerDuration;
-        timerVal.textContent = timerDuration + 's';
       }
+      timerSlider.value = timerDuration;
+      startTimerSlider.value = timerDuration;
+      timerVal.textContent = timerDuration + 's';
+      startTimerVal.textContent = timerDuration + 's';
 
       const savedSound = localStorage.getItem('mq_sound_enabled');
       if (savedSound !== null) {
         soundEnabled = savedSound === 'true';
-        soundToggle.checked = soundEnabled;
       }
+      soundToggle.checked = soundEnabled;
+      startSoundToggle.checked = soundEnabled;
 
       const savedHighScore = localStorage.getItem('mq_high_score');
       if (savedHighScore) {
         highScore = parseInt(savedHighScore, 10);
         startHighScoreEl.textContent = highScore;
+      }
+
+      const savedOperation = localStorage.getItem('mq_math_operation');
+      if (savedOperation) {
+        mathOperation = savedOperation;
+        document.querySelectorAll('.operation-card').forEach(card => {
+          card.classList.toggle('selected', card.dataset.op === mathOperation);
+        });
       }
 
       document.getElementById('version-display').textContent = SCRIPT_VERSION;
@@ -933,26 +1082,59 @@
     }
 
     function generateQuestion() {
-      let f1, f2, answerStr;
+      let f1, f2, opSymbol, answerVal;
+      let questionStr = '';
       let attempts = 0;
-      do {
-        f1 = Math.floor(Math.random() * 10) + 1;
-        f2 = Math.floor(Math.random() * 10) + 1;
-        answerStr = `${f1}x${f2}`;
-        attempts++;
-      } while (questionHistory.includes(answerStr) && attempts < 20);
 
-      questionHistory.push(answerStr);
+      let activeOp = mathOperation;
+      if (mathOperation === 'mixed') {
+        const ops = ['addition', 'subtraction', 'multiplication', 'division'];
+        activeOp = ops[Math.floor(Math.random() * ops.length)];
+      }
+      currentActiveOp = activeOp;
+
+      do {
+        if (activeOp === 'addition') {
+          f1 = Math.floor(Math.random() * 10) + 1;
+          f2 = Math.floor(Math.random() * 10) + 1;
+          answerVal = f1 + f2;
+          opSymbol = '+';
+          questionStr = `${f1}+${f2}`;
+        } else if (activeOp === 'subtraction') {
+          const n1 = Math.floor(Math.random() * 10) + 1;
+          const n2 = Math.floor(Math.random() * 10) + 1;
+          f1 = Math.max(n1, n2);
+          f2 = Math.min(n1, n2);
+          answerVal = f1 - f2;
+          opSymbol = '−';
+          questionStr = `${f1}-${f2}`;
+        } else if (activeOp === 'division') {
+          f2 = Math.floor(Math.random() * 10) + 1;
+          answerVal = Math.floor(Math.random() * 10) + 1;
+          f1 = f2 * answerVal;
+          opSymbol = '÷';
+          questionStr = `${f1}/${f2}`;
+        } else {
+          f1 = Math.floor(Math.random() * 10) + 1;
+          f2 = Math.floor(Math.random() * 10) + 1;
+          answerVal = f1 * f2;
+          opSymbol = '×';
+          questionStr = `${f1}*${f2}`;
+        }
+        attempts++;
+      } while (questionHistory.includes(questionStr) && attempts < 20);
+
+      questionHistory.push(questionStr);
       if (questionHistory.length > 8) {
         questionHistory.shift();
       }
 
       factor1 = f1;
       factor2 = f2;
-      correctAnswer = f1 * f2;
+      correctAnswer = answerVal;
       currentInput = '';
 
-      questionText.textContent = `${factor1} × ${factor2}`;
+      questionText.textContent = `${factor1} ${opSymbol} ${factor2}`;
       inputDisplay.textContent = '?';
       inputDisplay.className = 'input-display';
 
@@ -995,10 +1177,19 @@
         distractors.add(invertedDigits);
       }
 
-      const list = Array.from(distractors).filter(n => n > 0 && n <= 100 && n !== correctAnswer);
+      const list = Array.from(distractors).filter(n => n >= 0 && n <= 100 && n !== correctAnswer);
       
       while (list.length < 5) {
-        const rand = (Math.floor(Math.random() * 10) + 1) * (Math.floor(Math.random() * 10) + 1);
+        let rand;
+        if (currentActiveOp === 'addition') {
+          rand = Math.floor(Math.random() * 19) + 2;
+        } else if (currentActiveOp === 'subtraction') {
+          rand = Math.floor(Math.random() * 10);
+        } else if (currentActiveOp === 'division') {
+          rand = Math.floor(Math.random() * 10) + 1;
+        } else {
+          rand = (Math.floor(Math.random() * 10) + 1) * (Math.floor(Math.random() * 10) + 1);
+        }
         if (rand !== correctAnswer && !list.includes(rand)) {
           list.push(rand);
         }
@@ -1242,24 +1433,47 @@
       settingsModal.classList.remove('active');
     });
 
-    resetHighScoreBtn.addEventListener('click', () => {
+    function updateTimerDuration(val) {
+      timerDuration = parseInt(val, 10);
+      timerSlider.value = timerDuration;
+      startTimerSlider.value = timerDuration;
+      timerVal.textContent = timerDuration + 's';
+      startTimerVal.textContent = timerDuration + 's';
+      localStorage.setItem('mq_timer_duration', timerDuration);
+    }
+
+    timerSlider.addEventListener('input', (e) => updateTimerDuration(e.target.value));
+    startTimerSlider.addEventListener('input', (e) => updateTimerDuration(e.target.value));
+
+    function updateSoundEnabled(enabled) {
+      soundEnabled = enabled;
+      soundToggle.checked = soundEnabled;
+      startSoundToggle.checked = soundEnabled;
+      localStorage.setItem('mq_sound_enabled', soundEnabled);
+    }
+
+    soundToggle.addEventListener('change', (e) => updateSoundEnabled(e.target.checked));
+    startSoundToggle.addEventListener('change', (e) => updateSoundEnabled(e.target.checked));
+
+    function resetHighScore() {
       if (confirm('Are you sure you want to reset the high score?')) {
         highScore = 0;
         localStorage.setItem('mq_high_score', highScore);
         startHighScoreEl.textContent = highScore;
         settingsModal.classList.remove('active');
       }
-    });
+    }
 
-    timerSlider.addEventListener('input', () => {
-      timerDuration = parseInt(timerSlider.value, 10);
-      timerVal.textContent = timerDuration + 's';
-      localStorage.setItem('mq_timer_duration', timerDuration);
-    });
+    resetHighScoreBtn.addEventListener('click', resetHighScore);
+    startResetHighScoreBtn.addEventListener('click', resetHighScore);
 
-    soundToggle.addEventListener('change', () => {
-      soundEnabled = soundToggle.checked;
-      localStorage.setItem('mq_sound_enabled', soundEnabled);
+    document.querySelectorAll('.operation-card').forEach(card => {
+      card.addEventListener('click', () => {
+        document.querySelectorAll('.operation-card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        mathOperation = card.dataset.op;
+        localStorage.setItem('mq_math_operation', mathOperation);
+      });
     });
 
     document.querySelectorAll('.keypad-grid .key-btn').forEach(btn => {
