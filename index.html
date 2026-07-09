@@ -114,7 +114,7 @@
     .mode-select-container {
       width: 100%;
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 15px;
       margin-bottom: 30px;
     }
@@ -373,6 +373,100 @@
     .key-btn.submit:active {
       background: #5b4bc4;
     }
+    .voice-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      gap: 14px;
+    }
+    .voice-btn {
+      width: 90px;
+      height: 90px;
+      border: none;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #00b894, #00cec9);
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 20px rgba(0, 184, 148, 0.28);
+      transition: all 0.2s;
+    }
+    .voice-btn:active {
+      transform: scale(0.94);
+    }
+    .voice-btn.listening {
+      animation: voicePulse 0.9s infinite alternate;
+      background: linear-gradient(135deg, #ff7675, #e84393);
+    }
+    .voice-btn svg {
+      width: 42px;
+      height: 42px;
+      fill: currentColor;
+    }
+    .voice-answer-row {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      max-width: 320px;
+    }
+    .voice-answer-input {
+      flex: 1;
+      min-width: 0;
+      background: white;
+      border: 3px solid #cbd5e0;
+      border-radius: 18px;
+      height: 60px;
+      text-align: center;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: #2d3748;
+      outline: none;
+      box-shadow: inset 0 4px 8px rgba(0,0,0,0.05);
+      user-select: text;
+      -webkit-user-select: text;
+    }
+    .voice-answer-input.correct {
+      border-color: #2ecc71;
+      background: #eafaf1;
+      color: #27ae60;
+    }
+    .voice-answer-input.incorrect {
+      border-color: #e74c3c;
+      background: #fdf2f2;
+      color: #c0392b;
+    }
+    .voice-submit-btn {
+      width: 62px;
+      height: 60px;
+      border: none;
+      border-radius: 18px;
+      background: #6c5ce7;
+      color: white;
+      font-size: 1.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    }
+    .voice-submit-btn:active {
+      transform: scale(0.94);
+      background: #5b4bc4;
+    }
+    .voice-status {
+      min-height: 26px;
+      color: #4a5568;
+      font-size: 1.05rem;
+      font-weight: 700;
+      text-align: center;
+      max-width: 360px;
+    }
+    @keyframes voicePulse {
+      0% { transform: scale(1); box-shadow: 0 10px 20px rgba(232, 67, 147, 0.25); }
+      100% { transform: scale(1.08); box-shadow: 0 14px 30px rgba(232, 67, 147, 0.4); }
+    }
     .grid-container {
       display: grid;
       grid-template-columns: repeat(10, 1fr);
@@ -598,6 +692,21 @@
         font-size: 1.4rem;
         padding: 10px 0;
       }
+      .voice-btn {
+        width: 74px;
+        height: 74px;
+      }
+      .voice-btn svg {
+        width: 34px;
+        height: 34px;
+      }
+      .voice-answer-input, .voice-submit-btn {
+        height: 50px;
+      }
+      .voice-status {
+        font-size: 0.95rem;
+        min-height: 22px;
+      }
     }
     .section-title {
       font-size: 1.1rem;
@@ -677,6 +786,9 @@
       fill: #4a5568;
     }
     @media (max-width: 480px) {
+      .mode-select-container {
+        grid-template-columns: repeat(2, 1fr);
+      }
       .operation-select-container {
         grid-template-columns: repeat(3, 1fr);
       }
@@ -779,6 +891,10 @@
           <div class="mode-icon">🔢</div>
           <div class="mode-title">0-100 Grid</div>
         </div>
+        <div class="mode-card" data-mode="voice">
+          <div class="mode-icon">&#127908;</div>
+          <div class="mode-title">Voice</div>
+        </div>
       </div>
       <button class="play-btn" id="play-button">Play</button>
     </div>
@@ -834,6 +950,19 @@
             <button class="key-btn">0</button>
             <button class="key-btn submit" id="key-submit">✓</button>
           </div>
+        </div>
+
+        <div class="voice-container" id="voice-container" style="display: none;">
+          <button class="voice-btn" id="voice-button" type="button" aria-label="Speak answer">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.49 6-3.31 6-6.72h-1.7z"/>
+            </svg>
+          </button>
+          <div class="voice-answer-row">
+            <input class="voice-answer-input" id="voice-answer-input" type="text" inputmode="numeric" autocomplete="off" autocapitalize="off" enterkeyhint="done" aria-label="Answer">
+            <button class="voice-submit-btn" id="voice-submit-btn" type="button">âœ“</button>
+          </div>
+          <div class="voice-status" id="voice-status">Ready</div>
         </div>
 
         <div class="grid-container" id="grid-container" style="display: none;"></div>
@@ -895,7 +1024,15 @@
   </div>
 
   <script>
-    const SCRIPT_VERSION = 'v1.7.0-202607081025';
+    const SCRIPT_VERSION = 'v1.8.0-202607090435';
+    const SPEECH_LANGUAGE = 'en-US';
+    const MIN_ANSWER_VALUE = 0;
+    const MAX_ANSWER_VALUE = 100;
+    const VOICE_READY_TEXT = 'Tap mic or answer box';
+    const VOICE_LISTENING_TEXT = 'Listening...';
+    const VOICE_FALLBACK_TEXT = 'Use keyboard mic';
+    const VOICE_TRY_AGAIN_TEXT = 'Try again';
+    const VOICE_INPUT_SUBMIT_DELAY = 650;
 
     let gameMode = 'choice';
     let mathOperation = 'multiplication';
@@ -919,6 +1056,9 @@
     let timerInterval = null;
     let timeRemaining = 0;
     let audioCtx = null;
+    let recognition = null;
+    let isListening = false;
+    let voiceSubmitTimeout = null;
 
     const startScreen = document.getElementById('start-screen');
     const gameScreen = document.getElementById('game-screen');
@@ -945,6 +1085,11 @@
     const choiceGrid = document.getElementById('choice-grid');
     const typeContainer = document.getElementById('type-container');
     const inputDisplay = document.getElementById('input-display');
+    const voiceContainer = document.getElementById('voice-container');
+    const voiceButton = document.getElementById('voice-button');
+    const voiceAnswerInput = document.getElementById('voice-answer-input');
+    const voiceSubmitBtn = document.getElementById('voice-submit-btn');
+    const voiceStatus = document.getElementById('voice-status');
     const gridContainer = document.getElementById('grid-container');
     const confettiCanvas = document.getElementById('confetti-canvas');
 
@@ -952,6 +1097,47 @@
     let confettiParticles = [];
     let confettiAnimationId = null;
     const confettiColors = ['#FFC107', '#FF5722', '#E91E63', '#9C27B0', '#3F51B5', '#00BCD4', '#4CAF50', '#8BC34A'];
+    const numberWordValues = {
+      zero: 0,
+      oh: 0,
+      o: 0,
+      one: 1,
+      won: 1,
+      two: 2,
+      too: 2,
+      to: 2,
+      three: 3,
+      four: 4,
+      for: 4,
+      five: 5,
+      six: 6,
+      sex: 6,
+      seven: 7,
+      eight: 8,
+      ate: 8,
+      nine: 9,
+      ten: 10,
+      eleven: 11,
+      twelve: 12,
+      thirteen: 13,
+      fourteen: 14,
+      fifteen: 15,
+      sixteen: 16,
+      seventeen: 17,
+      eighteen: 18,
+      nineteen: 19
+    };
+    const tensWordValues = {
+      twenty: 20,
+      thirty: 30,
+      forty: 40,
+      fourty: 40,
+      fifty: 50,
+      sixty: 60,
+      seventy: 70,
+      eighty: 80,
+      ninety: 90
+    };
 
     const questionHistory = [];
 
@@ -1008,6 +1194,7 @@
       });
 
       document.getElementById('version-display').textContent = SCRIPT_VERSION;
+      setVoiceStatus(getVoiceReadyText());
 
       window.addEventListener('resize', resizeConfettiCanvas);
       resizeConfettiCanvas();
@@ -1130,6 +1317,213 @@
       }
     }
 
+    function getSpeechRecognitionApi() {
+      return window.SpeechRecognition || window.webkitSpeechRecognition || null;
+    }
+
+    function setVoiceStatus(text) {
+      voiceStatus.textContent = text;
+    }
+
+    function isStandaloneApp() {
+      return window.navigator.standalone === true || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+    }
+
+    function getVoiceReadyText() {
+      const SpeechRecognitionApi = getSpeechRecognitionApi();
+      if (!SpeechRecognitionApi || isStandaloneApp()) {
+        return VOICE_FALLBACK_TEXT;
+      }
+      return VOICE_READY_TEXT;
+    }
+
+    function resetVoiceInput() {
+      stopVoiceListening();
+      clearTimeout(voiceSubmitTimeout);
+      voiceAnswerInput.value = '';
+      voiceAnswerInput.className = 'voice-answer-input';
+      setVoiceStatus(getVoiceReadyText());
+    }
+
+    function stopVoiceListening() {
+      if (recognition && isListening) {
+        try {
+          recognition.stop();
+        } catch (e) {
+          setVoiceStatus(getVoiceReadyText());
+        }
+      }
+      isListening = false;
+      voiceButton.classList.remove('listening');
+    }
+
+    function parseSpokenAnswer(text) {
+      const normalizedText = text.toLowerCase().replace(/-/g, ' ').replace(/[^a-z0-9\s]/g, ' ');
+      const digitMatches = normalizedText.match(/\b\d{1,3}\b/g);
+      if (digitMatches) {
+        for (let i = 0; i < digitMatches.length; i++) {
+          const value = parseInt(digitMatches[i], 10);
+          if (value >= MIN_ANSWER_VALUE && value <= MAX_ANSWER_VALUE) {
+            return value;
+          }
+        }
+      }
+
+      const words = normalizedText.split(/\s+/).filter(word => word.length > 0);
+      for (let i = 0; i < words.length; i++) {
+        const word = words[i];
+        const nextWord = words[i + 1] || '';
+
+        if (word === 'hundred' || word === 'hundreds') {
+          return MAX_ANSWER_VALUE;
+        }
+
+        if (numberWordValues[word] !== undefined && (nextWord === 'hundred' || nextWord === 'hundreds')) {
+          const value = numberWordValues[word] * MAX_ANSWER_VALUE;
+          if (value >= MIN_ANSWER_VALUE && value <= MAX_ANSWER_VALUE) {
+            return value;
+          }
+        }
+
+        if (numberWordValues[word] === 0 && numberWordValues[nextWord] !== undefined && numberWordValues[nextWord] < 10) {
+          return numberWordValues[nextWord];
+        }
+
+        if (tensWordValues[word] !== undefined) {
+          let value = tensWordValues[word];
+          if (numberWordValues[nextWord] !== undefined && numberWordValues[nextWord] < 10) {
+            value += numberWordValues[nextWord];
+          }
+          if (value >= MIN_ANSWER_VALUE && value <= MAX_ANSWER_VALUE) {
+            return value;
+          }
+        }
+
+        if (numberWordValues[word] !== undefined) {
+          const value = numberWordValues[word];
+          if (value >= MIN_ANSWER_VALUE && value <= MAX_ANSWER_VALUE) {
+            return value;
+          }
+        }
+      }
+
+      return null;
+    }
+
+    function submitVoiceAnswer(value) {
+      if (isAnsweringBlocked) return;
+      isAnsweringBlocked = true;
+      clearTimeout(voiceSubmitTimeout);
+      stopVoiceListening();
+      clearInterval(timerInterval);
+      recordAnswerTime();
+
+      voiceAnswerInput.value = value;
+      if (value === correctAnswer) {
+        voiceAnswerInput.className = 'voice-answer-input correct';
+        setVoiceStatus('Correct');
+        handleCorrectAnswer();
+      } else {
+        voiceAnswerInput.className = 'voice-answer-input incorrect';
+        setVoiceStatus('Answer: ' + correctAnswer);
+        handleIncorrectAnswer();
+      }
+    }
+
+    function submitVoiceInputText() {
+      if (isAnsweringBlocked) return;
+      clearTimeout(voiceSubmitTimeout);
+      const value = parseSpokenAnswer(voiceAnswerInput.value);
+      if (value === null) {
+        setVoiceStatus(VOICE_TRY_AGAIN_TEXT);
+        return;
+      }
+      submitVoiceAnswer(value);
+    }
+
+    function scheduleVoiceInputSubmit() {
+      clearTimeout(voiceSubmitTimeout);
+      const originalText = voiceAnswerInput.value;
+      if (parseSpokenAnswer(originalText) === null) return;
+      voiceSubmitTimeout = setTimeout(() => {
+        if (!isAnsweringBlocked && gameMode === 'voice' && voiceAnswerInput.value === originalText) {
+          submitVoiceInputText();
+        }
+      }, VOICE_INPUT_SUBMIT_DELAY);
+    }
+
+    function startVoiceListening() {
+      if (isAnsweringBlocked) return;
+      const SpeechRecognitionApi = getSpeechRecognitionApi();
+      if (!SpeechRecognitionApi || isStandaloneApp()) {
+        setVoiceStatus(VOICE_FALLBACK_TEXT);
+        voiceAnswerInput.focus();
+        return;
+      }
+
+      stopVoiceListening();
+      recognition = new SpeechRecognitionApi();
+      recognition.lang = SPEECH_LANGUAGE;
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 3;
+
+      recognition.onstart = () => {
+        isListening = true;
+        voiceButton.classList.add('listening');
+        setVoiceStatus(VOICE_LISTENING_TEXT);
+      };
+
+      recognition.onresult = event => {
+        let parsedValue = null;
+        let heardText = '';
+        for (let i = 0; i < event.results.length; i++) {
+          const result = event.results[i];
+          for (let j = 0; j < result.length; j++) {
+            const transcript = result[j].transcript;
+            heardText = transcript;
+            parsedValue = parseSpokenAnswer(transcript);
+            if (parsedValue !== null) {
+              voiceAnswerInput.value = parsedValue;
+              submitVoiceAnswer(parsedValue);
+              return;
+            }
+          }
+        }
+        voiceAnswerInput.value = heardText;
+        setVoiceStatus(VOICE_TRY_AGAIN_TEXT);
+      };
+
+      recognition.onerror = event => {
+        isListening = false;
+        voiceButton.classList.remove('listening');
+        if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+          setVoiceStatus(VOICE_FALLBACK_TEXT);
+        } else if (event.error === 'no-speech') {
+          setVoiceStatus('No answer heard');
+        } else {
+          setVoiceStatus(VOICE_TRY_AGAIN_TEXT);
+        }
+      };
+
+      recognition.onend = () => {
+        isListening = false;
+        voiceButton.classList.remove('listening');
+        if (!isAnsweringBlocked && voiceStatus.textContent === VOICE_LISTENING_TEXT) {
+          setVoiceStatus(getVoiceReadyText());
+        }
+      };
+
+      try {
+        recognition.start();
+      } catch (e) {
+        isListening = false;
+        voiceButton.classList.remove('listening');
+        setVoiceStatus(VOICE_FALLBACK_TEXT);
+        voiceAnswerInput.focus();
+      }
+    }
+
     function generateQuestion() {
       let f1, f2, opSymbol, answerVal;
       let questionStr = '';
@@ -1186,6 +1580,7 @@
       questionText.textContent = `${factor1} ${opSymbol} ${factor2}`;
       inputDisplay.textContent = '?';
       inputDisplay.className = 'input-display';
+      resetVoiceInput();
 
       setupInputArea();
       resetTimer();
@@ -1195,12 +1590,15 @@
     function setupInputArea() {
       choiceGrid.style.display = 'none';
       typeContainer.style.display = 'none';
+      voiceContainer.style.display = 'none';
       gridContainer.style.display = 'none';
 
       if (gameMode === 'choice') {
         setupChoiceGrid();
       } else if (gameMode === 'type') {
         typeContainer.style.display = 'flex';
+      } else if (gameMode === 'voice') {
+        voiceContainer.style.display = 'flex';
       } else if (gameMode === 'grid') {
         setupGridContainer();
       }
@@ -1407,6 +1805,11 @@
       } else if (gameMode === 'type') {
         inputDisplay.className = 'input-display incorrect';
         inputDisplay.textContent = correctAnswer;
+      } else if (gameMode === 'voice') {
+        stopVoiceListening();
+        voiceAnswerInput.className = 'voice-answer-input incorrect';
+        voiceAnswerInput.value = correctAnswer;
+        setVoiceStatus('Answer: ' + correctAnswer);
       }
 
       streak = 0;
@@ -1500,6 +1903,7 @@
 
     backButton.addEventListener('click', () => {
       clearInterval(timerInterval);
+      stopVoiceListening();
       gameScreen.classList.remove('active');
       startScreen.classList.add('active');
       summaryModal.classList.remove('active');
@@ -1516,6 +1920,7 @@
     });
 
     summaryContinueBtn.addEventListener('click', () => {
+      stopVoiceListening();
       summaryModal.classList.remove('active');
       recentQuestionTimes = [];
       isAnsweringBlocked = false;
@@ -1580,6 +1985,19 @@
 
     document.getElementById('key-delete').addEventListener('click', handleTypeDelete);
     document.getElementById('key-submit').addEventListener('click', handleTypeSubmit);
+    voiceButton.addEventListener('click', startVoiceListening);
+    voiceSubmitBtn.addEventListener('click', submitVoiceInputText);
+    voiceAnswerInput.addEventListener('input', () => {
+      if (isAnsweringBlocked) return;
+      voiceAnswerInput.className = 'voice-answer-input';
+      setVoiceStatus(getVoiceReadyText());
+      scheduleVoiceInputSubmit();
+    });
+    voiceAnswerInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        submitVoiceInputText();
+      }
+    });
 
     window.addEventListener('keydown', (e) => {
       if (!gameScreen.classList.contains('active') || gameMode !== 'type' || isAnsweringBlocked) return;
