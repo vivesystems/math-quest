@@ -1,8 +1,10 @@
-const SCRIPT_VERSION = 'v1.9.1-202607120549';
+const SCRIPT_VERSION = 'v2.0.0-202607120621';
 const CACHE_NAME = 'math-quest-' + SCRIPT_VERSION;
 const APP_ASSETS = [
   './index.html',
   './manifest.webmanifest',
+  './icon-192.png',
+  './icon-512.png',
   './apple-touch-icon.png',
   './mascot.png'
 ];

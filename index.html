@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="referrer" content="no-referrer">
+  <meta name="theme-color" content="#a1c4fd">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Ian's Math Quest">
@@ -23,6 +26,7 @@
       font-family: ui-rounded, "SF Pro Rounded", "Arial Rounded MT Bold", system-ui, sans-serif;
       height: 100vh;
       height: -webkit-fill-available;
+      height: 100dvh;
       overflow: hidden;
       display: flex;
       justify-content: center;
@@ -45,7 +49,7 @@
       justify-content: center;
       align-items: center;
       position: relative;
-      padding: 20px;
+      padding: max(20px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
     }
     .screen {
       width: 100%;
@@ -63,6 +67,7 @@
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
       position: relative;
       z-index: 2;
+      min-height: 0;
     }
     .screen.active {
       display: flex;
@@ -129,6 +134,8 @@
       justify-content: center;
       transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       box-shadow: 0 8px 16px rgba(0,0,0,0.04);
+      font: inherit;
+      color: inherit;
     }
     .mode-card:hover {
       transform: translateY(-5px);
@@ -276,6 +283,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      min-height: 0;
     }
     .choice-grid {
       display: grid;
@@ -471,7 +479,7 @@
     }
     .grid-container {
       display: grid;
-      grid-template-columns: repeat(10, 1fr);
+      grid-template-columns: repeat(10, minmax(0, 1fr));
       gap: 5px;
       width: 100%;
       max-width: 580px;
@@ -491,6 +499,7 @@
       align-items: center;
       justify-content: center;
       box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+      min-width: 0;
     }
     .grid-btn:active {
       transform: scale(0.9);
@@ -539,6 +548,8 @@
       display: flex;
       flex-direction: column;
       gap: 20px;
+      max-height: 100%;
+      overflow-y: auto;
     }
     .modal-title {
       font-size: 1.8rem;
@@ -675,7 +686,7 @@
         gap: 10px;
       }
       .grid-container {
-        max-width: 480px;
+        max-width: 410px;
         gap: 3px;
       }
       .grid-btn {
@@ -738,6 +749,8 @@
       justify-content: center;
       transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       box-shadow: 0 8px 16px rgba(0,0,0,0.04);
+      font: inherit;
+      color: inherit;
     }
     .operation-card:hover {
       transform: translateY(-4px);
@@ -788,11 +801,34 @@
       fill: #4a5568;
     }
     @media (max-width: 480px) {
+      #app {
+        padding: max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+      }
+      .screen {
+        padding: 12px;
+        border-radius: 22px;
+      }
+      #start-screen {
+        overflow-y: auto;
+        justify-content: flex-start;
+      }
       .mode-select-container {
         grid-template-columns: repeat(2, 1fr);
       }
       .operation-select-container {
         grid-template-columns: repeat(3, 1fr);
+      }
+      .grid-container {
+        gap: 2px;
+        max-width: 100%;
+      }
+      .grid-btn {
+        border-radius: 4px;
+        padding: 3px 0;
+        font-size: 0.75rem;
+      }
+      .grid-btn-100 {
+        height: 28px;
       }
     }
     .mixed-ops-grid {
@@ -825,6 +861,25 @@
       border-color: #6c5ce7;
       color: #6c5ce7;
     }
+    button:focus-visible, input:focus-visible {
+      outline: 4px solid #2d3748;
+      outline-offset: 3px;
+    }
+    #start-screen {
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    #game-screen {
+      overflow: hidden;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
     .version-tag {
       position: absolute;
       bottom: 8px;
@@ -843,14 +898,14 @@
     <canvas id="confetti-canvas"></canvas>
 
     <div id="start-screen" class="screen active">
-      <button class="start-settings-btn" id="start-settings-btn">
+      <button class="start-settings-btn" id="start-settings-btn" type="button" aria-label="Open settings">
         <svg viewBox="0 0 24 24">
           <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
         </svg>
       </button>
       <h1>Ian's Math Quest</h1>
       <div class="logo-container">
-        <img class="mascot-img" src="mascot.png" alt="Mascot">
+        <img class="mascot-img" src="mascot.png" alt="Smiling yellow mascot">
         <div class="stat-badge" style="margin-bottom: 20px;">
           <span class="stat-icon">🏆</span>
           <span>High Score: <span id="start-high-score">0</span></span>
@@ -858,52 +913,52 @@
       </div>
       <div class="section-title">Select Operation</div>
       <div class="operation-select-container">
-        <div class="operation-card" data-op="addition">
+        <button class="operation-card" type="button" data-op="addition" aria-pressed="false">
           <div class="operation-icon">➕</div>
           <div class="operation-title">Add</div>
-        </div>
-        <div class="operation-card" data-op="subtraction">
+        </button>
+        <button class="operation-card" type="button" data-op="subtraction" aria-pressed="false">
           <div class="operation-icon">➖</div>
           <div class="operation-title">Subtract</div>
-        </div>
-        <div class="operation-card selected" data-op="multiplication">
+        </button>
+        <button class="operation-card selected" type="button" data-op="multiplication" aria-pressed="true">
           <div class="operation-icon">✖️</div>
           <div class="operation-title">Multiply</div>
-        </div>
-        <div class="operation-card" data-op="division">
+        </button>
+        <button class="operation-card" type="button" data-op="division" aria-pressed="false">
           <div class="operation-icon">➗</div>
           <div class="operation-title">Divide</div>
-        </div>
-        <div class="operation-card" data-op="mixed">
+        </button>
+        <button class="operation-card" type="button" data-op="mixed" aria-pressed="false">
           <div class="operation-icon">🎲</div>
           <div class="operation-title">Mixed</div>
-        </div>
+        </button>
       </div>
       <div class="section-title">Select Mode</div>
       <div class="mode-select-container">
-        <div class="mode-card selected" data-mode="choice">
+        <button class="mode-card selected" type="button" data-mode="choice" aria-pressed="true">
           <div class="mode-icon">🎈</div>
           <div class="mode-title">6 Choices</div>
-        </div>
-        <div class="mode-card" data-mode="type">
+        </button>
+        <button class="mode-card" type="button" data-mode="type" aria-pressed="false">
           <div class="mode-icon">✏️</div>
           <div class="mode-title">Keyboard</div>
-        </div>
-        <div class="mode-card" data-mode="grid">
+        </button>
+        <button class="mode-card" type="button" data-mode="grid" aria-pressed="false">
           <div class="mode-icon">🔢</div>
           <div class="mode-title">0-100 Grid</div>
-        </div>
-        <div class="mode-card" id="voice-mode-card" data-mode="voice">
+        </button>
+        <button class="mode-card" id="voice-mode-card" type="button" data-mode="voice" aria-pressed="false">
           <div class="mode-icon">&#127908;</div>
           <div class="mode-title">Voice</div>
-        </div>
+        </button>
       </div>
-      <button class="play-btn" id="play-button">Play</button>
+      <button class="play-btn" id="play-button" type="button">Play</button>
     </div>
 
     <div id="game-screen" class="screen">
       <div class="game-header">
-        <button class="header-btn" id="back-button">
+        <button class="header-btn" id="back-button" type="button" aria-label="Back to start">
           <svg viewBox="0 0 24 24">
             <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
           </svg>
@@ -918,7 +973,7 @@
             <span>Streak: <span id="current-streak">0</span></span>
           </div>
         </div>
-        <button class="header-btn" id="settings-button">
+        <button class="header-btn" id="settings-button" type="button" aria-label="Open settings">
           <svg viewBox="0 0 24 24">
             <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
           </svg>
@@ -926,11 +981,11 @@
       </div>
 
       <div class="timer-container">
-        <div class="timer-bar" id="timer-bar"></div>
+        <div class="timer-bar" id="timer-bar" role="progressbar" aria-label="Time remaining" aria-valuemin="0" aria-valuemax="9" aria-valuenow="9"></div>
       </div>
 
       <div class="question-card" id="question-card">
-        <div class="question-text" id="question-text">7 × 8</div>
+        <div class="question-text" id="question-text" aria-live="polite">7 × 8</div>
       </div>
 
       <div class="answers-container">
@@ -939,18 +994,18 @@
         <div class="type-container" id="type-container" style="display: none;">
           <div class="input-display" id="input-display">?</div>
           <div class="keypad-grid">
-            <button class="key-btn">1</button>
-            <button class="key-btn">2</button>
-            <button class="key-btn">3</button>
-            <button class="key-btn">4</button>
-            <button class="key-btn">5</button>
-            <button class="key-btn">6</button>
-            <button class="key-btn">7</button>
-            <button class="key-btn">8</button>
-            <button class="key-btn">9</button>
-            <button class="key-btn action" id="key-delete">⌫</button>
-            <button class="key-btn">0</button>
-            <button class="key-btn submit" id="key-submit">✓</button>
+            <button class="key-btn" type="button">1</button>
+            <button class="key-btn" type="button">2</button>
+            <button class="key-btn" type="button">3</button>
+            <button class="key-btn" type="button">4</button>
+            <button class="key-btn" type="button">5</button>
+            <button class="key-btn" type="button">6</button>
+            <button class="key-btn" type="button">7</button>
+            <button class="key-btn" type="button">8</button>
+            <button class="key-btn" type="button">9</button>
+            <button class="key-btn action" id="key-delete" type="button" aria-label="Delete last digit">⌫</button>
+            <button class="key-btn" type="button">0</button>
+            <button class="key-btn submit" id="key-submit" type="button" aria-label="Submit answer">✓</button>
           </div>
         </div>
 
@@ -962,25 +1017,25 @@
           </button>
           <div class="voice-answer-row">
             <input class="voice-answer-input" id="voice-answer-input" type="text" inputmode="numeric" autocomplete="off" autocapitalize="off" enterkeyhint="done" aria-label="Answer">
-            <button class="voice-submit-btn" id="voice-submit-btn" type="button">âœ“</button>
+            <button class="voice-submit-btn" id="voice-submit-btn" type="button" aria-label="Submit answer">✓</button>
           </div>
-          <div class="voice-status" id="voice-status">Ready</div>
+          <div class="voice-status" id="voice-status" aria-live="polite">Ready</div>
         </div>
 
         <div class="grid-container" id="grid-container" style="display: none;"></div>
       </div>
     </div>
 
-    <div class="modal-overlay" id="settings-modal">
-      <div class="modal-content">
-        <div class="modal-title">Settings</div>
+    <div class="modal-overlay" id="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <div class="modal-content" tabindex="-1">
+        <div class="modal-title" id="settings-title">Settings</div>
         <div class="setting-row">
           <div class="setting-label">
             <span>Timer (seconds)</span>
             <span id="timer-val">9s</span>
           </div>
           <div class="setting-input-wrapper">
-            <input type="range" min="3" max="20" value="9" class="setting-slider" id="timer-slider">
+            <input type="range" min="3" max="20" value="9" class="setting-slider" id="timer-slider" aria-label="Timer seconds">
           </div>
         </div>
         <div class="setting-row">
@@ -988,7 +1043,7 @@
             <span>Sound Effects</span>
           </div>
           <label class="toggle-switch">
-            <input type="checkbox" id="sound-toggle" checked>
+            <input type="checkbox" id="sound-toggle" aria-label="Sound effects" checked>
             <span class="slider-round"></span>
           </label>
         </div>
@@ -997,20 +1052,20 @@
             <span>Mixed Mode Operations</span>
           </div>
           <div class="mixed-ops-grid">
-            <button class="mixed-op-btn selected" data-op="addition" title="Add">➕</button>
-            <button class="mixed-op-btn selected" data-op="subtraction" title="Subtract">➖</button>
-            <button class="mixed-op-btn selected" data-op="multiplication" title="Multiply">✖️</button>
-            <button class="mixed-op-btn selected" data-op="division" title="Divide">➗</button>
+            <button class="mixed-op-btn selected" type="button" data-op="addition" aria-label="Include addition" aria-pressed="true">➕</button>
+            <button class="mixed-op-btn selected" type="button" data-op="subtraction" aria-label="Include subtraction" aria-pressed="true">➖</button>
+            <button class="mixed-op-btn selected" type="button" data-op="multiplication" aria-label="Include multiplication" aria-pressed="true">✖️</button>
+            <button class="mixed-op-btn selected" type="button" data-op="division" aria-label="Include division" aria-pressed="true">➗</button>
           </div>
         </div>
-        <button class="modal-btn danger" id="reset-high-score-btn">Reset High Score</button>
-        <button class="modal-btn" id="close-settings-btn">Close</button>
+        <button class="modal-btn danger" id="reset-high-score-btn" type="button">Reset High Score</button>
+        <button class="modal-btn" id="close-settings-btn" type="button">Close</button>
       </div>
     </div>
 
-    <div class="modal-overlay" id="summary-modal">
-      <div class="modal-content">
-        <div class="modal-title">Round Summary</div>
+    <div class="modal-overlay" id="summary-modal" role="dialog" aria-modal="true" aria-labelledby="summary-title">
+      <div class="modal-content" tabindex="-1">
+        <div class="modal-title" id="summary-title">Round Summary</div>
         <div class="setting-row" style="text-align: center; flex-direction: column; gap: 8px;">
           <div style="font-size: 1.15rem; color: #4a5568; font-weight: 600;">You answered 10 questions!</div>
           <div style="font-size: 1.7rem; color: #2d3748; font-weight: 700; margin: 10px 0;">
@@ -1020,13 +1075,13 @@
             Average: <span id="summary-avg-time">0.0</span>s per answer
           </div>
         </div>
-        <button class="modal-btn" id="summary-continue-btn" style="margin-top: 10px;">Continue</button>
+        <button class="modal-btn" id="summary-continue-btn" type="button" style="margin-top: 10px;">Continue</button>
       </div>
     </div>
   </div>
 
   <script>
-    const SCRIPT_VERSION = 'v1.9.1-202607120549';
+    const SCRIPT_VERSION = 'v2.0.0-202607120621';
     const SPEECH_LANGUAGE = 'en-US';
     const MIN_ANSWER_VALUE = 0;
     const MAX_ANSWER_VALUE = 100;
@@ -1035,11 +1090,19 @@
     const VOICE_FALLBACK_TEXT = 'Use keyboard mic';
     const VOICE_TRY_AGAIN_TEXT = 'Try again';
     const VOICE_INPUT_SUBMIT_DELAY = 650;
+    const DEFAULT_GAME_MODE = 'choice';
+    const DEFAULT_MATH_OPERATION = 'multiplication';
+    const DEFAULT_TIMER_DURATION = 9;
+    const MIN_TIMER_DURATION = 3;
+    const MAX_TIMER_DURATION = 20;
+    const VALID_GAME_MODES = ['choice', 'type', 'grid', 'voice'];
+    const VALID_MATH_OPERATIONS = ['addition', 'subtraction', 'multiplication', 'division', 'mixed'];
+    const DEFAULT_MIXED_OPERATIONS = ['addition', 'subtraction', 'multiplication', 'division'];
 
-    let gameMode = 'choice';
-    let mathOperation = 'multiplication';
+    let gameMode = DEFAULT_GAME_MODE;
+    let mathOperation = DEFAULT_MATH_OPERATION;
     let currentActiveOp = 'multiplication';
-    let timerDuration = 9;
+    let timerDuration = DEFAULT_TIMER_DURATION;
     let soundEnabled = true;
     let mixedOps = ['addition', 'subtraction', 'multiplication', 'division'];
 
@@ -1052,17 +1115,28 @@
     let correctAnswer = 0;
     let currentInput = '';
     let isAnsweringBlocked = false;
-    let questionStartTime = 0;
+    let questionActiveStartedAt = 0;
+    let questionActiveElapsed = 0;
     let recentQuestionTimes = [];
 
     let timerInterval = null;
+    let timerDeadline = 0;
+    let timerPaused = false;
+    let lastTickSecond = null;
     let questionTransitionTimeout = null;
+    let questionTransitionDeadline = 0;
+    let questionTransitionRemaining = 0;
+    let questionTransitionCallback = null;
     let timeRemaining = 0;
     let audioCtx = null;
     const activeOscillators = new Set();
     let recognition = null;
     let isListening = false;
     let voiceSubmitTimeout = null;
+    const pauseReasons = new Set();
+    let activeModalTrigger = null;
+    let serviceWorkerRefreshing = false;
+    let serviceWorkerUpdatePending = false;
 
     const startScreen = document.getElementById('start-screen');
     const gameScreen = document.getElementById('game-screen');
@@ -1116,7 +1190,6 @@
       for: 4,
       five: 5,
       six: 6,
-      sex: 6,
       seven: 7,
       eight: 8,
       ate: 8,
@@ -1146,58 +1219,99 @@
 
     const questionHistory = [];
 
-    function init() {
-      let savedMode = localStorage.getItem('mq_game_mode');
-      if (!savedMode) {
-        savedMode = 'choice';
-        localStorage.setItem('mq_game_mode', savedMode);
+    function readStoredValue(key) {
+      try {
+        return localStorage.getItem(key);
+      } catch (error) {
+        console.error('Unable to read saved game data:', error);
+        return null;
       }
-      gameMode = savedMode;
-      configureVoiceModeAvailability();
-      document.querySelectorAll('.mode-card').forEach(card => {
-        card.classList.toggle('selected', card.dataset.mode === gameMode);
-      });
+    }
 
-      const savedTimer = localStorage.getItem('mq_timer_duration');
-      if (savedTimer) {
-        timerDuration = parseInt(savedTimer, 10);
+    function writeStoredValue(key, value) {
+      try {
+        localStorage.setItem(key, value);
+      } catch (error) {
+        console.error('Unable to save game data:', error);
       }
+    }
+
+    function readStoredChoice(key, validValues, fallback) {
+      const savedValue = readStoredValue(key);
+      const value = validValues.includes(savedValue) ? savedValue : fallback;
+      if (savedValue !== value) writeStoredValue(key, value);
+      return value;
+    }
+
+    function readStoredInteger(key, fallback, minimum, maximum) {
+      const savedValue = readStoredValue(key);
+      const parsedValue = Number.parseInt(savedValue, 10);
+      const value = Number.isInteger(parsedValue) && parsedValue >= minimum && parsedValue <= maximum ? parsedValue : fallback;
+      if (savedValue !== String(value)) writeStoredValue(key, value);
+      return value;
+    }
+
+    function readStoredBoolean(key, fallback) {
+      const savedValue = readStoredValue(key);
+      if (savedValue === 'true') return true;
+      if (savedValue === 'false') return false;
+      writeStoredValue(key, fallback);
+      return fallback;
+    }
+
+    function readStoredMixedOperations() {
+      const savedValue = readStoredValue('mq_mixed_ops');
+      if (savedValue) {
+        try {
+          const parsedValue = JSON.parse(savedValue);
+          if (Array.isArray(parsedValue)) {
+            const validOperations = [...new Set(parsedValue.filter(operation => DEFAULT_MIXED_OPERATIONS.includes(operation)))];
+            if (validOperations.length > 0) {
+              if (JSON.stringify(validOperations) !== savedValue) writeStoredValue('mq_mixed_ops', JSON.stringify(validOperations));
+              return validOperations;
+            }
+          }
+        } catch (error) {
+          console.warn('Invalid saved mixed operations were reset:', error);
+        }
+      }
+      const fallback = [...DEFAULT_MIXED_OPERATIONS];
+      writeStoredValue('mq_mixed_ops', JSON.stringify(fallback));
+      return fallback;
+    }
+
+    function updateSelection(selector, selectedValue, dataKey) {
+      document.querySelectorAll(selector).forEach(element => {
+        const selected = element.dataset[dataKey] === selectedValue;
+        element.classList.toggle('selected', selected);
+        element.setAttribute('aria-pressed', String(selected));
+      });
+    }
+
+    function init() {
+      gameMode = readStoredChoice('mq_game_mode', VALID_GAME_MODES, DEFAULT_GAME_MODE);
+      configureVoiceModeAvailability();
+      updateSelection('.mode-card', gameMode, 'mode');
+
+      timerDuration = readStoredInteger('mq_timer_duration', DEFAULT_TIMER_DURATION, MIN_TIMER_DURATION, MAX_TIMER_DURATION);
       timerSlider.value = timerDuration;
       timerVal.textContent = timerDuration + 's';
 
-      const savedSound = localStorage.getItem('mq_sound_enabled');
-      if (savedSound !== null) {
-        soundEnabled = savedSound === 'true';
-      }
+      soundEnabled = readStoredBoolean('mq_sound_enabled', true);
       soundToggle.checked = soundEnabled;
 
-      const savedMixedOps = localStorage.getItem('mq_mixed_ops');
-      if (savedMixedOps) {
-        try {
-          mixedOps = JSON.parse(savedMixedOps);
-        } catch (e) {
-          mixedOps = ['addition', 'subtraction', 'multiplication', 'division'];
-        }
-      }
+      mixedOps = readStoredMixedOperations();
       document.querySelectorAll('.mixed-op-btn').forEach(btn => {
-        btn.classList.toggle('selected', mixedOps.includes(btn.dataset.op));
+        const selected = mixedOps.includes(btn.dataset.op);
+        btn.classList.toggle('selected', selected);
+        btn.setAttribute('aria-pressed', String(selected));
       });
 
-      const savedHighScore = localStorage.getItem('mq_high_score');
-      if (savedHighScore) {
-        highScore = parseInt(savedHighScore, 10);
-        startHighScoreEl.textContent = highScore;
-      }
+      highScore = readStoredInteger('mq_high_score', 0, 0, Number.MAX_SAFE_INTEGER);
+      startHighScoreEl.textContent = highScore;
 
-      let savedOperation = localStorage.getItem('mq_math_operation');
-      if (!savedOperation) {
-        savedOperation = 'multiplication';
-        localStorage.setItem('mq_math_operation', savedOperation);
-      }
-      mathOperation = savedOperation;
-      document.querySelectorAll('.operation-card').forEach(card => {
-        card.classList.toggle('selected', card.dataset.op === mathOperation);
-      });
+      mathOperation = readStoredChoice('mq_math_operation', VALID_MATH_OPERATIONS, DEFAULT_MATH_OPERATION);
+      updateSelection('.operation-card', mathOperation, 'op');
 
       document.getElementById('version-display').textContent = SCRIPT_VERSION;
       setVoiceStatus(getVoiceReadyText());
@@ -1209,6 +1323,15 @@
 
     function registerOfflineWorker() {
       if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (serviceWorkerRefreshing) return;
+          if (gameScreen.classList.contains('active')) {
+            serviceWorkerUpdatePending = true;
+            return;
+          }
+          serviceWorkerRefreshing = true;
+          window.location.reload();
+        });
         navigator.serviceWorker.register('./sw.js').catch(error => {
           console.error('Offline setup failed:', error);
         });
@@ -1216,19 +1339,30 @@
     }
 
     function getAudioContext() {
-      if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (!soundEnabled) return null;
+      const AudioContextApi = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextApi) return null;
+      try {
+        if (!audioCtx) {
+          audioCtx = new AudioContextApi();
+        }
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume().catch(error => {
+            console.error('Unable to resume game audio:', error);
+          });
+        }
+        return audioCtx;
+      } catch (error) {
+        console.error('Unable to start game audio:', error);
+        return null;
       }
-      if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
-      }
-      return audioCtx;
     }
 
     function playTone(freq, start, duration, type = 'sine', volume = 0.15) {
       if (!soundEnabled) return;
       try {
         const ctx = getAudioContext();
+        if (!ctx) return;
         const now = ctx.currentTime;
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
@@ -1242,7 +1376,9 @@
         gain.connect(ctx.destination);
         osc.start(now + start);
         osc.stop(now + start + duration);
-      } catch (e) {}
+      } catch (error) {
+        console.error('Unable to play game sound:', error);
+      }
     }
 
     function playSuccessSound() {
@@ -1256,6 +1392,7 @@
       try {
         if (!soundEnabled) return;
         const ctx = getAudioContext();
+        if (!ctx) return;
         const now = ctx.currentTime;
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
@@ -1270,7 +1407,9 @@
         gain.connect(ctx.destination);
         osc.start(now);
         osc.stop(now + 0.4);
-      } catch (e) {}
+      } catch (error) {
+        console.error('Unable to play failure sound:', error);
+      }
     }
 
     function playTickSound() {
@@ -1291,6 +1430,52 @@
     function clearQuestionTransition() {
       clearTimeout(questionTransitionTimeout);
       questionTransitionTimeout = null;
+      questionTransitionDeadline = 0;
+      questionTransitionRemaining = 0;
+      questionTransitionCallback = null;
+    }
+
+    function startQuestionTransition() {
+      if (!questionTransitionCallback || pauseReasons.size > 0) return;
+      questionTransitionDeadline = performance.now() + questionTransitionRemaining;
+      questionTransitionTimeout = setTimeout(() => {
+        const callback = questionTransitionCallback;
+        questionTransitionTimeout = null;
+        questionTransitionDeadline = 0;
+        questionTransitionRemaining = 0;
+        questionTransitionCallback = null;
+        callback();
+      }, questionTransitionRemaining);
+    }
+
+    function scheduleQuestionTransition(callback, delay) {
+      clearQuestionTransition();
+      questionTransitionCallback = callback;
+      questionTransitionRemaining = delay;
+      startQuestionTransition();
+    }
+
+    function pauseQuestionTransition() {
+      if (questionTransitionTimeout === null) return;
+      questionTransitionRemaining = Math.max(0, questionTransitionDeadline - performance.now());
+      clearTimeout(questionTransitionTimeout);
+      questionTransitionTimeout = null;
+      questionTransitionDeadline = 0;
+    }
+
+    function resumeQuestionTransition() {
+      if (questionTransitionCallback && questionTransitionTimeout === null) {
+        startQuestionTransition();
+      }
+    }
+
+    function stopConfetti() {
+      if (confettiAnimationId !== null) {
+        cancelAnimationFrame(confettiAnimationId);
+      }
+      confettiAnimationId = null;
+      confettiParticles = [];
+      confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
     }
 
     function resizeConfettiCanvas() {
@@ -1348,6 +1533,7 @@
       if (active) {
         confettiAnimationId = requestAnimationFrame(animateConfetti);
       } else {
+        confettiAnimationId = null;
         confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
       }
     }
@@ -1368,8 +1554,8 @@
       const voiceModeAvailable = !isStandaloneApp();
       voiceModeCard.hidden = !voiceModeAvailable;
       if (!voiceModeAvailable && gameMode === 'voice') {
-        gameMode = 'choice';
-        localStorage.setItem('mq_game_mode', gameMode);
+        gameMode = DEFAULT_GAME_MODE;
+        writeStoredValue('mq_game_mode', gameMode);
       }
     }
 
@@ -1384,16 +1570,20 @@
     function resetVoiceInput() {
       stopVoiceListening();
       clearTimeout(voiceSubmitTimeout);
+      voiceSubmitTimeout = null;
       voiceAnswerInput.value = '';
       voiceAnswerInput.className = 'voice-answer-input';
       setVoiceStatus(getVoiceReadyText());
     }
 
     function stopVoiceListening() {
-      if (recognition && isListening) {
+      const activeRecognition = recognition;
+      recognition = null;
+      if (activeRecognition && isListening) {
         try {
-          recognition.stop();
-        } catch (e) {
+          activeRecognition.stop();
+        } catch (error) {
+          console.error('Unable to stop voice recognition:', error);
           setVoiceStatus(getVoiceReadyText());
         }
       }
@@ -1433,6 +1623,15 @@
           return numberWordValues[nextWord];
         }
 
+        if (numberWordValues[word] !== undefined && numberWordValues[word] < 10 && numberWordValues[nextWord] !== undefined && numberWordValues[nextWord] < 10) {
+          const thirdWord = words[i + 2] || '';
+          if (numberWordValues[thirdWord] !== undefined && numberWordValues[thirdWord] < 10) {
+            const threeDigitValue = (numberWordValues[word] * 100) + (numberWordValues[nextWord] * 10) + numberWordValues[thirdWord];
+            if (threeDigitValue <= MAX_ANSWER_VALUE) return threeDigitValue;
+          }
+          return (numberWordValues[word] * 10) + numberWordValues[nextWord];
+        }
+
         if (tensWordValues[word] !== undefined) {
           let value = tensWordValues[word];
           if (numberWordValues[nextWord] !== undefined && numberWordValues[nextWord] < 10) {
@@ -1458,8 +1657,9 @@
       if (isAnsweringBlocked) return;
       isAnsweringBlocked = true;
       clearTimeout(voiceSubmitTimeout);
+      voiceSubmitTimeout = null;
       stopVoiceListening();
-      clearInterval(timerInterval);
+      stopTimer();
       recordAnswerTime();
 
       voiceAnswerInput.value = value;
@@ -1477,6 +1677,7 @@
     function submitVoiceInputText() {
       if (isAnsweringBlocked) return;
       clearTimeout(voiceSubmitTimeout);
+      voiceSubmitTimeout = null;
       const value = parseSpokenAnswer(voiceAnswerInput.value);
       if (value === null) {
         setVoiceStatus(VOICE_TRY_AGAIN_TEXT);
@@ -1490,6 +1691,7 @@
       const originalText = voiceAnswerInput.value;
       if (parseSpokenAnswer(originalText) === null) return;
       voiceSubmitTimeout = setTimeout(() => {
+        voiceSubmitTimeout = null;
         if (!isAnsweringBlocked && gameMode === 'voice' && voiceAnswerInput.value === originalText) {
           submitVoiceInputText();
         }
@@ -1506,19 +1708,22 @@
       }
 
       stopVoiceListening();
-      recognition = new SpeechRecognitionApi();
-      recognition.lang = SPEECH_LANGUAGE;
-      recognition.continuous = false;
-      recognition.interimResults = false;
-      recognition.maxAlternatives = 3;
+      const activeRecognition = new SpeechRecognitionApi();
+      recognition = activeRecognition;
+      activeRecognition.lang = SPEECH_LANGUAGE;
+      activeRecognition.continuous = false;
+      activeRecognition.interimResults = false;
+      activeRecognition.maxAlternatives = 3;
 
-      recognition.onstart = () => {
+      activeRecognition.onstart = () => {
+        if (recognition !== activeRecognition) return;
         isListening = true;
         voiceButton.classList.add('listening');
         setVoiceStatus(VOICE_LISTENING_TEXT);
       };
 
-      recognition.onresult = event => {
+      activeRecognition.onresult = event => {
+        if (recognition !== activeRecognition) return;
         let parsedValue = null;
         let heardText = '';
         for (let i = 0; i < event.results.length; i++) {
@@ -1538,7 +1743,9 @@
         setVoiceStatus(VOICE_TRY_AGAIN_TEXT);
       };
 
-      recognition.onerror = event => {
+      activeRecognition.onerror = event => {
+        if (recognition !== activeRecognition) return;
+        recognition = null;
         isListening = false;
         voiceButton.classList.remove('listening');
         if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
@@ -1550,7 +1757,9 @@
         }
       };
 
-      recognition.onend = () => {
+      activeRecognition.onend = () => {
+        if (recognition !== activeRecognition) return;
+        recognition = null;
         isListening = false;
         voiceButton.classList.remove('listening');
         if (!isAnsweringBlocked && voiceStatus.textContent === VOICE_LISTENING_TEXT) {
@@ -1559,8 +1768,10 @@
       };
 
       try {
-        recognition.start();
-      } catch (e) {
+        activeRecognition.start();
+      } catch (error) {
+        if (recognition === activeRecognition) recognition = null;
+        console.error('Unable to start voice recognition:', error);
         isListening = false;
         voiceButton.classList.remove('listening');
         setVoiceStatus(VOICE_FALLBACK_TEXT);
@@ -1628,7 +1839,8 @@
 
       setupInputArea();
       resetTimer();
-      questionStartTime = Date.now();
+      questionActiveElapsed = 0;
+      questionActiveStartedAt = performance.now();
     }
 
     function setupInputArea() {
@@ -1693,6 +1905,7 @@
 
       finalOptions.forEach(opt => {
         const btn = document.createElement('button');
+        btn.type = 'button';
         btn.className = 'choice-btn';
         btn.textContent = opt;
         btn.addEventListener('click', () => handleChoiceSelection(btn, opt));
@@ -1706,6 +1919,7 @@
 
       for (let i = 0; i <= 99; i++) {
         const btn = document.createElement('button');
+        btn.type = 'button';
         btn.className = 'grid-btn';
         btn.textContent = i;
         btn.addEventListener('click', () => handleGridSelection(btn, i));
@@ -1713,35 +1927,120 @@
       }
 
       const btn100 = document.createElement('button');
+      btn100.type = 'button';
       btn100.className = 'grid-btn grid-btn-100';
       btn100.textContent = '100';
       btn100.addEventListener('click', () => handleGridSelection(btn100, 100));
       gridContainer.appendChild(btn100);
     }
 
-    function resetTimer() {
+    function stopTimer() {
       clearInterval(timerInterval);
+      timerInterval = null;
+      timerDeadline = 0;
+      timerPaused = false;
+      lastTickSecond = null;
+    }
+
+    function runTimerTick() {
+      timeRemaining = Math.max(0, (timerDeadline - performance.now()) / 1000);
+      if (timeRemaining <= 0) {
+        stopTimer();
+        timeRemaining = 0;
+        updateTimerBar();
+        handleTimeout();
+        return;
+      }
+
+      const tickSecond = Math.ceil(timeRemaining);
+      if (tickSecond <= 3 && tickSecond !== lastTickSecond) {
+        lastTickSecond = tickSecond;
+        playTickSound();
+      }
+      updateTimerBar();
+    }
+
+    function startTimerInterval() {
+      timerDeadline = performance.now() + (timeRemaining * 1000);
+      timerInterval = setInterval(runTimerTick, 100);
+    }
+
+    function resetTimer() {
+      stopTimer();
       timeRemaining = timerDuration;
       updateTimerBar();
+      if (pauseReasons.size > 0) {
+        timerPaused = true;
+        return;
+      }
+      startTimerInterval();
+    }
 
-      timerInterval = setInterval(() => {
-        timeRemaining -= 0.1;
-        if (timeRemaining <= 0) {
-          timeRemaining = 0;
-          clearInterval(timerInterval);
-          handleTimeout();
-        } else {
-          if (timeRemaining <= 3 && Math.abs((timeRemaining * 10) % 10) < 0.1) {
-            playTickSound();
-          }
-          updateTimerBar();
+    function pauseTimer() {
+      if (timerInterval === null) return;
+      timeRemaining = Math.max(0, (timerDeadline - performance.now()) / 1000);
+      clearInterval(timerInterval);
+      timerInterval = null;
+      timerDeadline = 0;
+      timerPaused = true;
+      updateTimerBar();
+    }
+
+    function resumeTimer() {
+      if (!timerPaused || isAnsweringBlocked || !gameScreen.classList.contains('active')) return;
+      timerPaused = false;
+      if (timeRemaining <= 0) {
+        handleTimeout();
+        return;
+      }
+      startTimerInterval();
+    }
+
+    function pauseGame(reason) {
+      const wasRunning = pauseReasons.size === 0;
+      pauseReasons.add(reason);
+      if (wasRunning) {
+        accumulateQuestionTime();
+        pauseTimer();
+        pauseQuestionTransition();
+        clearTimeout(voiceSubmitTimeout);
+        voiceSubmitTimeout = null;
+        stopVoiceListening();
+        stopGameAudio();
+      }
+    }
+
+    function resumeGame(reason) {
+      pauseReasons.delete(reason);
+      if (pauseReasons.size === 0) {
+        if (gameScreen.classList.contains('active') && !isAnsweringBlocked) {
+          questionActiveStartedAt = performance.now();
         }
-      }, 100);
+        resumeTimer();
+        resumeQuestionTransition();
+      }
+    }
+
+    function stopGameActivity() {
+      stopTimer();
+      clearQuestionTransition();
+      clearTimeout(voiceSubmitTimeout);
+      voiceSubmitTimeout = null;
+      stopVoiceListening();
+      stopGameAudio();
+      stopConfetti();
+      pauseReasons.clear();
+      questionActiveStartedAt = 0;
+      questionActiveElapsed = 0;
+      isAnsweringBlocked = false;
+      questionCard.classList.remove('shake-animation');
     }
 
     function updateTimerBar() {
-      const pct = (timeRemaining / timerDuration) * 100;
+      const pct = Math.max(0, Math.min(100, (timeRemaining / timerDuration) * 100));
       timerBar.style.width = `${pct}%`;
+      timerBar.setAttribute('aria-valuemax', String(timerDuration));
+      timerBar.setAttribute('aria-valuenow', String(Math.ceil(timeRemaining)));
       
       timerBar.className = 'timer-bar';
       if (timeRemaining <= 3) {
@@ -1751,15 +2050,22 @@
       }
     }
 
+    function accumulateQuestionTime() {
+      if (questionActiveStartedAt > 0) {
+        questionActiveElapsed += performance.now() - questionActiveStartedAt;
+        questionActiveStartedAt = 0;
+      }
+    }
+
     function recordAnswerTime() {
-      const elapsed = (Date.now() - questionStartTime) / 1000;
-      recentQuestionTimes.push(elapsed);
+      accumulateQuestionTime();
+      recentQuestionTimes.push(questionActiveElapsed / 1000);
     }
 
     function handleChoiceSelection(button, selectedValue) {
       if (isAnsweringBlocked) return;
       isAnsweringBlocked = true;
-      clearInterval(timerInterval);
+      stopTimer();
       recordAnswerTime();
 
       if (selectedValue === correctAnswer) {
@@ -1783,7 +2089,7 @@
     function handleGridSelection(button, selectedValue) {
       if (isAnsweringBlocked) return;
       isAnsweringBlocked = true;
-      clearInterval(timerInterval);
+      stopTimer();
       recordAnswerTime();
 
       if (selectedValue === correctAnswer) {
@@ -1823,7 +2129,7 @@
     function handleTypeSubmit() {
       if (isAnsweringBlocked || currentInput === '') return;
       isAnsweringBlocked = true;
-      clearInterval(timerInterval);
+      stopTimer();
       recordAnswerTime();
 
       const val = parseInt(currentInput, 10);
@@ -1859,9 +2165,7 @@
       streak = 0;
       currentStreakEl.textContent = streak;
 
-      clearQuestionTransition();
-      questionTransitionTimeout = setTimeout(() => {
-        questionTransitionTimeout = null;
+      scheduleQuestionTransition(() => {
         questionCard.classList.remove('shake-animation');
         if (recentQuestionTimes.length >= 10) {
           showRoundSummary();
@@ -1877,7 +2181,7 @@
       const avg = total / recentQuestionTimes.length;
       summaryTotalTime.textContent = total.toFixed(1);
       summaryAvgTime.textContent = avg.toFixed(2);
-      summaryModal.classList.add('active');
+      openModal(summaryModal, summaryContinueBtn);
     }
 
     function handleCorrectAnswer() {
@@ -1890,7 +2194,7 @@
 
       if (score > highScore) {
         highScore = score;
-        localStorage.setItem('mq_high_score', highScore);
+        writeStoredValue('mq_high_score', highScore);
         startHighScoreEl.textContent = highScore;
       }
 
@@ -1898,9 +2202,7 @@
         triggerConfetti();
       }
 
-      clearQuestionTransition();
-      questionTransitionTimeout = setTimeout(() => {
-        questionTransitionTimeout = null;
+      scheduleQuestionTransition(() => {
         if (recentQuestionTimes.length >= 10) {
           showRoundSummary();
         } else {
@@ -1917,9 +2219,7 @@
       streak = 0;
       currentStreakEl.textContent = streak;
 
-      clearQuestionTransition();
-      questionTransitionTimeout = setTimeout(() => {
-        questionTransitionTimeout = null;
+      scheduleQuestionTransition(() => {
         questionCard.classList.remove('shake-animation');
         if (recentQuestionTimes.length >= 10) {
           showRoundSummary();
@@ -1930,16 +2230,60 @@
       }, 3000);
     }
 
+    function openModal(modal, focusTarget) {
+      activeModalTrigger = document.activeElement;
+      modal.classList.add('active');
+      requestAnimationFrame(() => {
+        (focusTarget || modal.querySelector('button, input, [tabindex]')).focus();
+      });
+    }
+
+    function closeSettings() {
+      settingsModal.classList.remove('active');
+      resumeGame('settings');
+      if (activeModalTrigger && typeof activeModalTrigger.focus === 'function') {
+        activeModalTrigger.focus();
+      }
+      activeModalTrigger = null;
+    }
+
+    function openSettings(trigger) {
+      if (gameScreen.classList.contains('active')) pauseGame('settings');
+      openModal(settingsModal, closeSettingsBtn);
+      activeModalTrigger = trigger;
+    }
+
+    function trapModalFocus(event) {
+      const activeModal = settingsModal.classList.contains('active') ? settingsModal : summaryModal.classList.contains('active') ? summaryModal : null;
+      if (!activeModal || event.key !== 'Tab') return false;
+      const focusableElements = [...activeModal.querySelectorAll('button, input, [tabindex]')]
+        .filter(element => !element.disabled && element.getClientRects().length > 0);
+      if (focusableElements.length === 0) return false;
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+      if (event.shiftKey && document.activeElement === firstElement) {
+        event.preventDefault();
+        lastElement.focus();
+        return true;
+      }
+      if (!event.shiftKey && document.activeElement === lastElement) {
+        event.preventDefault();
+        firstElement.focus();
+        return true;
+      }
+      return false;
+    }
+
     document.querySelectorAll('.mode-card').forEach(card => {
       card.addEventListener('click', () => {
-        document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('selected'));
-        card.classList.add('selected');
         gameMode = card.dataset.mode;
-        localStorage.setItem('mq_game_mode', gameMode);
+        updateSelection('.mode-card', gameMode, 'mode');
+        writeStoredValue('mq_game_mode', gameMode);
       });
     });
 
     playButton.addEventListener('click', () => {
+      stopGameActivity();
       getAudioContext();
       startScreen.classList.remove('active');
       gameScreen.classList.add('active');
@@ -1952,33 +2296,31 @@
     });
 
     backButton.addEventListener('click', () => {
-      clearInterval(timerInterval);
-      timerInterval = null;
-      clearQuestionTransition();
-      clearTimeout(voiceSubmitTimeout);
-      voiceSubmitTimeout = null;
-      stopVoiceListening();
-      stopGameAudio();
-      isAnsweringBlocked = false;
-      questionCard.classList.remove('shake-animation');
+      stopGameActivity();
       gameScreen.classList.remove('active');
       startScreen.classList.add('active');
+      settingsModal.classList.remove('active');
       summaryModal.classList.remove('active');
       recentQuestionTimes = [];
       startHighScoreEl.textContent = highScore;
+      if (serviceWorkerUpdatePending) {
+        serviceWorkerRefreshing = true;
+        window.location.reload();
+      }
     });
 
     settingsButton.addEventListener('click', () => {
-      settingsModal.classList.add('active');
+      openSettings(settingsButton);
     });
 
     closeSettingsBtn.addEventListener('click', () => {
-      settingsModal.classList.remove('active');
+      closeSettings();
     });
 
     summaryContinueBtn.addEventListener('click', () => {
       stopVoiceListening();
       summaryModal.classList.remove('active');
+      activeModalTrigger = null;
       recentQuestionTimes = [];
       isAnsweringBlocked = false;
       generateQuestion();
@@ -1987,12 +2329,17 @@
     timerSlider.addEventListener('input', () => {
       timerDuration = parseInt(timerSlider.value, 10);
       timerVal.textContent = timerDuration + 's';
-      localStorage.setItem('mq_timer_duration', timerDuration);
+      writeStoredValue('mq_timer_duration', timerDuration);
+      if (gameScreen.classList.contains('active') && !isAnsweringBlocked) {
+        timeRemaining = timerDuration;
+        updateTimerBar();
+      }
     });
 
     soundToggle.addEventListener('change', () => {
       soundEnabled = soundToggle.checked;
-      localStorage.setItem('mq_sound_enabled', soundEnabled);
+      writeStoredValue('mq_sound_enabled', soundEnabled);
+      if (!soundEnabled) stopGameAudio();
     });
 
     document.querySelectorAll('.mixed-op-btn').forEach(btn => {
@@ -2003,34 +2350,35 @@
           if (mixedOps.length > 1) {
             mixedOps.splice(index, 1);
             btn.classList.remove('selected');
+            btn.setAttribute('aria-pressed', 'false');
           }
         } else {
           mixedOps.push(op);
           btn.classList.add('selected');
+          btn.setAttribute('aria-pressed', 'true');
         }
-        localStorage.setItem('mq_mixed_ops', JSON.stringify(mixedOps));
+        writeStoredValue('mq_mixed_ops', JSON.stringify(mixedOps));
       });
     });
 
     resetHighScoreBtn.addEventListener('click', () => {
       if (confirm('Are you sure you want to reset the high score?')) {
         highScore = 0;
-        localStorage.setItem('mq_high_score', highScore);
+        writeStoredValue('mq_high_score', highScore);
         startHighScoreEl.textContent = highScore;
-        settingsModal.classList.remove('active');
+        closeSettings();
       }
     });
 
     startSettingsBtn.addEventListener('click', () => {
-      settingsModal.classList.add('active');
+      openSettings(startSettingsBtn);
     });
 
     document.querySelectorAll('.operation-card').forEach(card => {
       card.addEventListener('click', () => {
-        document.querySelectorAll('.operation-card').forEach(c => c.classList.remove('selected'));
-        card.classList.add('selected');
         mathOperation = card.dataset.op;
-        localStorage.setItem('mq_math_operation', mathOperation);
+        updateSelection('.operation-card', mathOperation, 'op');
+        writeStoredValue('mq_math_operation', mathOperation);
       });
     });
 
@@ -2057,6 +2405,12 @@
     });
 
     window.addEventListener('keydown', (e) => {
+      if (trapModalFocus(e)) return;
+      if (e.key === 'Escape' && settingsModal.classList.contains('active')) {
+        e.preventDefault();
+        closeSettings();
+        return;
+      }
       if (!gameScreen.classList.contains('active') || gameMode !== 'type' || isAnsweringBlocked) return;
       if (e.key >= '0' && e.key <= '9') {
         handleTypeInput(e.key);
@@ -2065,6 +2419,24 @@
       } else if (e.key === 'Enter') {
         handleTypeSubmit();
       }
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        if (gameScreen.classList.contains('active')) pauseGame('visibility');
+        stopConfetti();
+      } else {
+        resumeGame('visibility');
+      }
+    });
+
+    window.addEventListener('pagehide', () => {
+      if (gameScreen.classList.contains('active')) pauseGame('visibility');
+      stopConfetti();
+    });
+
+    window.addEventListener('pageshow', () => {
+      if (!document.hidden) resumeGame('visibility');
     });
 
     window.addEventListener('DOMContentLoaded', init);
