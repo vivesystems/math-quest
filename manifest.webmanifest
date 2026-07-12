@@ -1,0 +1,16 @@
+{
+  "name": "Ian's Math Quest",
+  "short_name": "Ian's Math Quest",
+  "display": "standalone",
+  "start_url": "./",
+  "scope": "./",
+  "background_color": "#a1c4fd",
+  "theme_color": "#a1c4fd",
+  "icons": [
+    {
+      "src": "apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}

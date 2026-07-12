@@ -6,11 +6,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Ian's Math Quest">
-  <link rel="manifest" href='data:application/manifest+json,{"name":"Ian&#39;s Math Quest","short_name":"Ian&#39;s Math Quest","display":"standalone","start_url":"https://vivesystems.github.io/math-quest/","icons":[{"src":"apple-touch-icon.png","sizes":"180x180","type":"image/png"}]}'>
+  <link rel="manifest" href="manifest.webmanifest">
   <title>Ian's Math Quest</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiNhMWM0ZmQiLz48cGF0aCBkPSJNMzIgNDYgQzMyIDQ2IDE2IDM0IDE2IDI0IEE4IDggMCAwIDEgMzIgMTYgQTggOCAwIDAgMSA0OCAyNCBDNDggMzQgMzIgNDYgMzIgNDYgWiIgZmlsbD0iI2ZmNzY3NSIvPjx0ZXh0IHg9IjMyIiB5PSIyNCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI5MDAiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiMyZDM3NDgiIHRleHQtYW5jaG9yPSJtaWRkbGUiPklhbjwvdGV4dD48dGV4dCB4PSIzMiIgeT0i5MiIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI5MDAiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiMyZDM3NDgiIHRleHQtYW5jaG9yPSJtaWRkbGUiPk1hdGg8L3RleHQ+PC9zdmc+">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     * {
       box-sizing: border-box;
@@ -21,7 +20,7 @@
       -webkit-touch-callout: none;
     }
     body {
-      font-family: 'Fredoka', sans-serif;
+      font-family: ui-rounded, "SF Pro Rounded", "Arial Rounded MT Bold", system-ui, sans-serif;
       height: 100vh;
       height: -webkit-fill-available;
       overflow: hidden;
@@ -139,6 +138,9 @@
       border-color: #6c5ce7;
       background: rgba(255, 255, 255, 0.95);
       box-shadow: 0 12px 24px rgba(108, 92, 231, 0.2);
+    }
+    .mode-card[hidden] {
+      display: none;
     }
     .mode-icon {
       font-size: 2.5rem;
@@ -420,7 +422,7 @@
       border-radius: 18px;
       height: 60px;
       text-align: center;
-      font-family: 'Fredoka', sans-serif;
+      font-family: ui-rounded, "SF Pro Rounded", "Arial Rounded MT Bold", system-ui, sans-serif;
       font-size: 2rem;
       font-weight: 700;
       color: #2d3748;
@@ -891,7 +893,7 @@
           <div class="mode-icon">🔢</div>
           <div class="mode-title">0-100 Grid</div>
         </div>
-        <div class="mode-card" data-mode="voice">
+        <div class="mode-card" id="voice-mode-card" data-mode="voice">
           <div class="mode-icon">&#127908;</div>
           <div class="mode-title">Voice</div>
         </div>
@@ -1024,7 +1026,7 @@
   </div>
 
   <script>
-    const SCRIPT_VERSION = 'v1.8.0-202607090435';
+    const SCRIPT_VERSION = 'v1.9.0-202607120538';
     const SPEECH_LANGUAGE = 'en-US';
     const MIN_ANSWER_VALUE = 0;
     const MAX_ANSWER_VALUE = 100;
@@ -1086,6 +1088,7 @@
     const typeContainer = document.getElementById('type-container');
     const inputDisplay = document.getElementById('input-display');
     const voiceContainer = document.getElementById('voice-container');
+    const voiceModeCard = document.getElementById('voice-mode-card');
     const voiceButton = document.getElementById('voice-button');
     const voiceAnswerInput = document.getElementById('voice-answer-input');
     const voiceSubmitBtn = document.getElementById('voice-submit-btn');
@@ -1148,6 +1151,7 @@
         localStorage.setItem('mq_game_mode', savedMode);
       }
       gameMode = savedMode;
+      configureVoiceModeAvailability();
       document.querySelectorAll('.mode-card').forEach(card => {
         card.classList.toggle('selected', card.dataset.mode === gameMode);
       });
@@ -1198,6 +1202,15 @@
 
       window.addEventListener('resize', resizeConfettiCanvas);
       resizeConfettiCanvas();
+      registerOfflineWorker();
+    }
+
+    function registerOfflineWorker() {
+      if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
+        navigator.serviceWorker.register('./sw.js').catch(error => {
+          console.error('Offline setup failed:', error);
+        });
+      }
     }
 
     function getAudioContext() {
@@ -1327,6 +1340,15 @@
 
     function isStandaloneApp() {
       return window.navigator.standalone === true || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+    }
+
+    function configureVoiceModeAvailability() {
+      const voiceModeAvailable = !isStandaloneApp();
+      voiceModeCard.hidden = !voiceModeAvailable;
+      if (!voiceModeAvailable && gameMode === 'voice') {
+        gameMode = 'choice';
+        localStorage.setItem('mq_game_mode', gameMode);
+      }
     }
 
     function getVoiceReadyText() {
