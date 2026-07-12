@@ -1026,7 +1026,7 @@
   </div>
 
   <script>
-    const SCRIPT_VERSION = 'v1.9.0-202607120538';
+    const SCRIPT_VERSION = 'v1.9.1-202607120549';
     const SPEECH_LANGUAGE = 'en-US';
     const MIN_ANSWER_VALUE = 0;
     const MAX_ANSWER_VALUE = 100;
@@ -1056,8 +1056,10 @@
     let recentQuestionTimes = [];
 
     let timerInterval = null;
+    let questionTransitionTimeout = null;
     let timeRemaining = 0;
     let audioCtx = null;
+    const activeOscillators = new Set();
     let recognition = null;
     let isListening = false;
     let voiceSubmitTimeout = null;
@@ -1230,6 +1232,8 @@
         const now = ctx.currentTime;
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
+        activeOscillators.add(osc);
+        osc.addEventListener('ended', () => activeOscillators.delete(osc), { once: true });
         osc.type = type;
         osc.frequency.setValueAtTime(freq, now + start);
         gain.gain.setValueAtTime(volume, now + start);
@@ -1255,6 +1259,8 @@
         const now = ctx.currentTime;
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
+        activeOscillators.add(osc);
+        osc.addEventListener('ended', () => activeOscillators.delete(osc), { once: true });
         osc.type = 'sawtooth';
         osc.frequency.setValueAtTime(150, now);
         osc.frequency.linearRampToValueAtTime(80, now + 0.4);
@@ -1269,6 +1275,22 @@
 
     function playTickSound() {
       playTone(800, 0, 0.04, 'sine', 0.05);
+    }
+
+    function stopGameAudio() {
+      activeOscillators.forEach(oscillator => {
+        try {
+          oscillator.stop();
+        } catch (error) {
+          console.error('Unable to stop game sound:', error);
+        }
+      });
+      activeOscillators.clear();
+    }
+
+    function clearQuestionTransition() {
+      clearTimeout(questionTransitionTimeout);
+      questionTransitionTimeout = null;
     }
 
     function resizeConfettiCanvas() {
@@ -1837,7 +1859,9 @@
       streak = 0;
       currentStreakEl.textContent = streak;
 
-      setTimeout(() => {
+      clearQuestionTransition();
+      questionTransitionTimeout = setTimeout(() => {
+        questionTransitionTimeout = null;
         questionCard.classList.remove('shake-animation');
         if (recentQuestionTimes.length >= 10) {
           showRoundSummary();
@@ -1874,7 +1898,9 @@
         triggerConfetti();
       }
 
-      setTimeout(() => {
+      clearQuestionTransition();
+      questionTransitionTimeout = setTimeout(() => {
+        questionTransitionTimeout = null;
         if (recentQuestionTimes.length >= 10) {
           showRoundSummary();
         } else {
@@ -1891,7 +1917,9 @@
       streak = 0;
       currentStreakEl.textContent = streak;
 
-      setTimeout(() => {
+      clearQuestionTransition();
+      questionTransitionTimeout = setTimeout(() => {
+        questionTransitionTimeout = null;
         questionCard.classList.remove('shake-animation');
         if (recentQuestionTimes.length >= 10) {
           showRoundSummary();
@@ -1925,7 +1953,14 @@
 
     backButton.addEventListener('click', () => {
       clearInterval(timerInterval);
+      timerInterval = null;
+      clearQuestionTransition();
+      clearTimeout(voiceSubmitTimeout);
+      voiceSubmitTimeout = null;
       stopVoiceListening();
+      stopGameAudio();
+      isAnsweringBlocked = false;
+      questionCard.classList.remove('shake-animation');
       gameScreen.classList.remove('active');
       startScreen.classList.add('active');
       summaryModal.classList.remove('active');
